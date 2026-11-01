@@ -1,0 +1,943 @@
+[
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "hint": "拖动右下角圆盘，或按方向键 / WASD。重力会保持在你指向的方向。",
+    "id": "tut_grav",
+    "name": "初识引力",
+    "chapter": "序章 · 让世界倾斜",
+    "tag": "重力 / 惯性",
+    "intro": "你不必推动小球。试着改变整个世界的方向。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "ramp",
+        "type": "rect",
+        "x": 660,
+        "y": 760,
+        "w": 820,
+        "h": 24,
+        "isStatic": true,
+        "category": "terrain",
+        "angle": 0.09
+      }
+    ],
+    "tutorial": [
+      "向右拖动重力圆盘",
+      "保持右下重力，让球沿斜坡滚动",
+      "送入绿色收集器"
+    ]
+  },
+  {
+    "boards": 2,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [
+      {
+        "type": "lever",
+        "bodyId": "lever",
+        "anchor": {
+          "x": 680,
+          "y": 790
+        },
+        "limit": 0.28
+      }
+    ],
+    "sensors": [],
+    "hint": "先让球压过杠杆。选择木板，在虚线缺口处拖动放置，搭一座桥。",
+    "id": "tut_mech",
+    "name": "支点与桥",
+    "chapter": "序章 · 让世界倾斜",
+    "tag": "杠杆 / 搭桥",
+    "intro": "一个支点，让两端的重量开始对话。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "start",
+        "type": "rect",
+        "x": 300,
+        "y": 835,
+        "w": 540,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "end",
+        "type": "rect",
+        "x": 1500,
+        "y": 835,
+        "w": 720,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "lever",
+        "type": "rect",
+        "x": 680,
+        "y": 790,
+        "w": 450,
+        "h": 24,
+        "isStatic": false,
+        "category": "lever",
+        "density": 0.006,
+        "frictionAir": 0.04
+      }
+    ],
+    "tutorial": [
+      "重力向右，观察杠杆转动",
+      "拖出木板，填补虚线缺口",
+      "送球进入收集器"
+    ],
+    "bridgeGuide": {
+      "x": 1020,
+      "y": 790,
+      "w": 320
+    }
+  },
+  {
+    "boards": 0,
+    "lines": 3,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "hint": "双指捏合小球（桌面用 − / +）缩小至 0.5 倍，穿过墙上的窄缝。画线可做导流坡道。",
+    "id": "tut_hand",
+    "name": "小一点，近一点",
+    "chapter": "序章 · 让世界倾斜",
+    "tag": "缩放 / 画线",
+    "intro": "有些出口，需要换一种尺度才能看见。",
+    "resizable": true,
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 48,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "wallTop",
+        "type": "rect",
+        "x": 1000,
+        "y": 425,
+        "w": 60,
+        "h": 580,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "wallBottom",
+        "type": "rect",
+        "x": 1000,
+        "y": 830,
+        "w": 60,
+        "h": 120,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "tutorial": [
+      "捏合小球，缩小到 0.5 倍",
+      "选择画线，在空白处画一道坡",
+      "穿过窄缝，抵达收集器"
+    ]
+  },
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "hint": "向右滚过斜坡；适当向上倾斜，可以绕道拾取空中的碎片。",
+    "id": "ch1_l01",
+    "name": "微光的轨迹",
+    "chapter": "第一章 · 引力之间",
+    "tag": "斜坡 / 惯性",
+    "intro": "跟随那道微光，去往空间的另一端。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "slopeA",
+        "type": "rect",
+        "x": 550,
+        "y": 710,
+        "w": 660,
+        "h": 28,
+        "isStatic": true,
+        "category": "terrain",
+        "angle": 0.16
+      },
+      {
+        "id": "slopeB",
+        "type": "rect",
+        "x": 1270,
+        "y": 710,
+        "w": 480,
+        "h": 28,
+        "isStatic": true,
+        "category": "terrain",
+        "angle": -0.15
+      }
+    ],
+    "shard": {
+      "x": 1000,
+      "y": 460
+    }
+  },
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [
+      {
+        "type": "lever",
+        "bodyId": "lever",
+        "anchor": {
+          "x": 860,
+          "y": 740
+        },
+        "limit": 0.42
+      }
+    ],
+    "sensors": [],
+    "hint": "球压在杠杆不同位置会使其旋转。调整重力，把球从右端送出。",
+    "id": "ch1_l02",
+    "name": "两端之间",
+    "chapter": "第一章 · 引力之间",
+    "tag": "杠杆 / 平衡",
+    "intro": "此处的下降，恰是彼处的上升。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "lever",
+        "type": "rect",
+        "x": 860,
+        "y": 740,
+        "w": 450,
+        "h": 24,
+        "isStatic": false,
+        "category": "lever",
+        "density": 0.006,
+        "frictionAir": 0.04
+      }
+    ],
+    "shard": {
+      "x": 1010,
+      "y": 540
+    }
+  },
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1660,
+      "y": 735,
+      "r": 62
+    },
+    "mechanisms": [
+      {
+        "type": "door",
+        "bodyId": "gate",
+        "anchor": {
+          "x": 1130,
+          "y": 515
+        }
+      }
+    ],
+    "sensors": [
+      {
+        "id": "beam",
+        "type": "laser",
+        "x": 660,
+        "y": 660,
+        "w": 20,
+        "h": 310,
+        "target": "gate"
+      }
+    ],
+    "hint": "让球经过青色光束，激活开关。沿流光观察远处的门如何打开。",
+    "id": "ch1_l03",
+    "name": "光的回声",
+    "chapter": "第一章 · 引力之间",
+    "tag": "激光 / 铰链门",
+    "intro": "一道光被触碰，远处便有了回应。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "gate",
+        "type": "rect",
+        "x": 1130,
+        "y": 665,
+        "w": 30,
+        "h": 300,
+        "isStatic": true,
+        "category": "door"
+      }
+    ],
+    "shard": {
+      "x": 1350,
+      "y": 480
+    }
+  },
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1600,
+      "y": 450,
+      "r": 62
+    },
+    "mechanisms": [
+      {
+        "type": "spring",
+        "bodyId": "spring",
+        "gain": 18
+      }
+    ],
+    "sensors": [],
+    "hint": "向右滚上紫色弹簧板，球会被弹起。空中把重力调向右方，落到高台。",
+    "id": "ch1_l04",
+    "name": "向上的可能",
+    "chapter": "第一章 · 引力之间",
+    "tag": "弹簧 / 弹射",
+    "intro": "所有被压低的力量，都在等待一次向上。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "spring",
+        "type": "rect",
+        "x": 820,
+        "y": 805,
+        "w": 220,
+        "h": 28,
+        "isStatic": true,
+        "category": "spring"
+      },
+      {
+        "id": "shelf",
+        "type": "rect",
+        "x": 1580,
+        "y": 550,
+        "w": 480,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "shard": {
+      "x": 1120,
+      "y": 320
+    }
+  },
+  {
+    "boards": 2,
+    "lines": 2,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1670,
+      "y": 480,
+      "r": 62
+    },
+    "mechanisms": [
+      {
+        "type": "lever",
+        "bodyId": "lever",
+        "anchor": {
+          "x": 660,
+          "y": 770
+        },
+        "limit": 0.35
+      },
+      {
+        "type": "spring",
+        "bodyId": "spring",
+        "gain": 19
+      }
+    ],
+    "sensors": [],
+    "hint": "搭桥越过缺口，借弹簧抵达右侧高台。画线可以帮助你控制空中的路线。",
+    "id": "ch1_l05",
+    "name": "万物相连",
+    "chapter": "第一章 · 引力之间",
+    "tag": "杠杆 / 弹射 / 搭桥",
+    "intro": "将每一个微小的改变，连成一条归途。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      },
+      {
+        "id": "start",
+        "type": "rect",
+        "x": 340,
+        "y": 850,
+        "w": 620,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "springFloor",
+        "type": "rect",
+        "x": 1110,
+        "y": 850,
+        "w": 300,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "lever",
+        "type": "rect",
+        "x": 660,
+        "y": 770,
+        "w": 450,
+        "h": 24,
+        "isStatic": false,
+        "category": "lever",
+        "density": 0.006,
+        "frictionAir": 0.04
+      },
+      {
+        "id": "spring",
+        "type": "rect",
+        "x": 1100,
+        "y": 805,
+        "w": 190,
+        "h": 28,
+        "isStatic": true,
+        "category": "spring"
+      },
+      {
+        "id": "shelf",
+        "type": "rect",
+        "x": 1650,
+        "y": 575,
+        "w": 390,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "shard": {
+      "x": 1450,
+      "y": 310
+    },
+    "bridgeGuide": {
+      "x": 860,
+      "y": 790,
+      "w": 320
+    }
+  },
+  {
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1670,
+      "y": 735,
+      "r": 62,
+      "acceptColor": "blue"
+    },
+    "mechanisms": [],
+    "sensors": [
+      {
+        "id": "red",
+        "type": "laser",
+        "x": 570,
+        "y": 635,
+        "w": 16,
+        "h": 350,
+        "dye": "red"
+      },
+      {
+        "id": "wash",
+        "type": "wash",
+        "x": 850,
+        "y": 650,
+        "w": 150,
+        "h": 330
+      },
+      {
+        "id": "blue",
+        "type": "laser",
+        "x": 1190,
+        "y": 635,
+        "w": 16,
+        "h": 350,
+        "dye": "blue"
+      }
+    ],
+    "hint": "依次穿过红光、白色洗色区、蓝光。球会保留最后染上的颜色，蓝色收集器只接受蓝球。",
+    "id": "demo_color",
+    "name": "三色回廊 · 预览",
+    "chapter": "实验室 · 光的颜色",
+    "tag": "染色 / 洗色 / 过滤",
+    "intro": "光会留下颜色。只有同色的光，能够找到归宿。",
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 525,
+        "w": 60,
+        "h": 790,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 125,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 260,
+        "y": 620,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.18
+      }
+    ]
+  }
+]

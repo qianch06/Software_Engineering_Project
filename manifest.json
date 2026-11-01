@@ -1,0 +1,5 @@
+{
+  "name": "失衡空间", "appid": "__UNI__GRAVITYSHIFT", "description": "失衡空间 · 物理解谜 Demo", "versionName": "0.1.0", "versionCode": "100", "vueVersion": "3",
+  "app-plus": { "usingComponents": true, "orientation": ["landscape-primary", "landscape-secondary"], "distribute": { "android": { "minSdkVersion": 26, "permissions": [] }, "ios": { "deploymentTarget": "13.0" } } },
+  "h5": { "title": "失衡空间 · Gravity Shift" }
+}
