@@ -9,7 +9,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:8765/static/game/index.html?debug=1');await page.waitForTimeout(400);
   await page.screenshot({path:path.join(out,'01-menu.png')});
-  await page.click('#start');assert.equal(await page.locator('.level-card').count(),9);
+  await page.click('#start');assert.equal(await page.locator('.level-card').count(),18);
   await page.locator('.level-card').nth(1).click();assert.ok((await page.locator('#toast').textContent()).includes('先完成'));
   await page.locator('.level-card').first().click();await page.waitForTimeout(400);
   await page.screenshot({path:path.join(out,'02-game.png')});
@@ -28,11 +28,11 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   // Scale and draw physically solid line, then undo all changes.
   await page.evaluate(()=>__demo.start(2));await page.click('#smaller');assert.ok(await page.evaluate(()=>__demo.g.physics.get('ball').scale<1));await page.click('#tool-line');await page.mouse.move(380,430);await page.mouse.down();for(let x=390;x<600;x+=15)await page.mouse.move(x,430-(x-380)*.1);await page.mouse.up();assert.ok(await page.evaluate(()=>__demo.g.history.some(h=>h.type==='line')));await page.click('#clear');assert.equal(await page.evaluate(()=>__demo.g.physics.get('ball').scale),1);
   // Beam contact dyes persistently; only wash restores white; wrong color doesn't win.
-  await page.evaluate(()=>{__demo.start(8);const d=__demo;d.g.physics.position('ball',{x:570,y:650});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'red');
-  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:710,y:650});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'red');
-  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:850,y:650});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'white');
+  await page.evaluate(()=>{__demo.start(16);const d=__demo;d.g.physics.position('ball',{x:500,y:640});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'red');
+  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:670,y:640});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'red');
+  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:1070,y:640});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'white');
   await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',d.g.level.collector);for(let i=0;i<20;i++)d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.state),'playing');
-  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:1190,y:650});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'blue');
+  await page.evaluate(()=>{const d=__demo;d.g.physics.position('ball',{x:1260,y:640});d.step(1000/60);});assert.equal(await page.evaluate(()=>__demo.g.ballColor),'blue');
   // Beam opens door with an observable source → target link.
   await page.evaluate(()=>{__demo.start(5);__demo.g.physics.position('ball',{x:660,y:650});__demo.step(1000/60);});assert.ok(await page.evaluate(()=>__demo.g.openDoors.gate&&__demo.g.links.length));
   await page.screenshot({path:path.join(out,'04-mechanism.png')});
@@ -48,6 +48,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   // The direct file entry also works with networking entirely disabled.
   const offline=await browser.newContext({offline:true,viewport:{width:1280,height:720}}),filePage=await offline.newPage();
   filePage.on('pageerror',e=>errors.push(e.message));
-  await filePage.goto(require('node:url').pathToFileURL(path.resolve(__dirname,'../index.html')).href);await filePage.waitForSelector('#start');await filePage.click('#start');await filePage.locator('.level-card').first().click();assert.equal(await filePage.locator('#play').isVisible(),true);await offline.close();
+  await filePage.goto(require('node:url').pathToFileURL(path.resolve(__dirname,'../play.html')).href);await filePage.waitForSelector('#start');await filePage.click('#start');await filePage.locator('.level-card').first().click();assert.equal(await filePage.locator('#play').isVisible(),true);await offline.close();
   assert.deepEqual(errors,[]);console.log('Browser checks passed; screenshots:',out);await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

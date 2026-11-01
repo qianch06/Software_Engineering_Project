@@ -1,5 +1,71 @@
 {
-  "name": "失衡空间", "appid": "__UNI__GRAVITYSHIFT", "description": "失衡空间 · 物理解谜 Demo", "versionName": "0.1.0", "versionCode": "100", "vueVersion": "3",
-  "app-plus": { "usingComponents": true, "orientation": ["landscape-primary", "landscape-secondary"], "distribute": { "android": { "minSdkVersion": 26, "permissions": [] }, "ios": { "deploymentTarget": "13.0" } } },
-  "h5": { "title": "失衡空间 · Gravity Shift" }
+  "name": "失衡空间",
+  "appid": "__UNI__GRAVITYSHIFT",
+  "description": "单机离线物理解谜游戏：18关与倒映章",
+  "versionName": "0.2.0",
+  "versionCode": "200",
+  "vueVersion": "3",
+  "app-plus": {
+    "usingComponents": true,
+    "orientation": [
+      "landscape-primary",
+      "landscape-secondary"
+    ],
+    "distribute": {
+      "android": {
+        "minSdkVersion": 26,
+        "permissions": [],
+        "packagename": "com.gravityshift.game",
+        "targetSdkVersion": 35,
+        "abiFilters": [
+          "arm64-v8a",
+          "armeabi-v7a"
+        ]
+      },
+      "ios": {
+        "deploymentTarget": "13.0"
+      },
+      "icons": {
+        "android": {
+          "mdpi": "static/icons/mdpi.png",
+          "hdpi": "static/icons/hdpi.png",
+          "xhdpi": "static/icons/xhdpi.png",
+          "xxhdpi": "static/icons/xxhdpi.png",
+          "xxxhdpi": "static/icons/xxxhdpi.png"
+        }
+      }
+    },
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {
+      "Accelerometer": {}
+    },
+    "statusbar": {
+      "immersed": true,
+      "style": "light",
+      "background": "#101f25"
+    },
+    "safearea": {
+      "background": "#101f25",
+      "bottom": {
+        "offset": "none"
+      }
+    },
+    "analytics": false
+  },
+  "h5": {
+    "title": "失衡空间 · Gravity Shift",
+    "router": {
+      "mode": "hash",
+      "base": "./"
+    }
+  },
+  "uniStatistics": {
+    "enable": false
+  }
 }

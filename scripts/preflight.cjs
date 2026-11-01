@@ -1,0 +1,13 @@
+const fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8')),cloud=process.argv.includes('--cloud');
+const issues=[];
+for(const file of ['App.vue','main.js','pages.json','index.html','static/game/index.html','static/game/js/runtime.js','static/game/js/platform.js','static/game/vendor/matter.min.js'])if(!fs.existsSync(path.join(root,file)))issues.push('缺少文件：'+file);
+if(/location\.replace/.test(fs.readFileSync(path.join(root,'index.html'),'utf8')))issues.push('uni-app 入口不应跳转静态网页');
+if(m.vueVersion!=='3')issues.push('需配置 Vue3');
+if(!m['app-plus'].orientation.includes('landscape-primary'))issues.push('缺少横屏配置');
+if(m.uniStatistics?.enable!==false)issues.push('应关闭非必要的 uni 统计');
+if(cloud&&(!/^__UNI__[A-Z0-9]{7}$/.test(m.appid)||m.appid==='__UNI__GRAVITYSHIFT'))issues.push('manifest.json 的 appid 尚未绑定：请登录 HBuilderX，点击“获取/重新获取 DCloud AppID”，使用自己账号创建的真实 AppID。');
+if(!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2,}$/.test(m['app-plus'].distribute.android.packagename))issues.push('Android 包名格式不正确');
+require('../static/game/js/core.js');const levels=JSON.parse(fs.readFileSync(path.join(root,'static/game/data/levels.json'),'utf8'));levels.forEach(GameCore.validateLevel);
+console.log('关卡校验通过：'+levels.length+' 基础关卡。');
+if(issues.length){issues.forEach(i=>console.error('待处理：'+i));process.exitCode=1;}else console.log(cloud?'云打包静态配置检查通过；账号权限、签名和云端额度仍由 HBuilderX 验证。':'本地工程检查通过。APK 打包前运行 node scripts/preflight.cjs --cloud。');

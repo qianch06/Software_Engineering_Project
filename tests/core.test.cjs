@@ -5,14 +5,14 @@ global.Matter=require('../static/game/vendor/matter.min.js');
 require('../static/game/js/physics.js');
 require('../static/game/js/levels.js');
 const {StorageService,GravityController,validateLevel,rating}=global.GameCore;
-test('全部 9 关合法，悬空引用、非法尺寸和缺少洗色区均被拒绝',()=>{
-  assert.equal(LEVELS.length,9);LEVELS.forEach(validateLevel);
+test('全部 18 关合法，悬空引用、非法尺寸和缺少洗色区均被拒绝',()=>{
+  assert.equal(LEVELS.length,18);LEVELS.forEach(validateLevel);
   const bad=structuredClone(LEVELS[0]);bad.bodies[0].w=-2;assert.throws(()=>validateLevel(bad));
   const ref=structuredClone(LEVELS[5]);ref.sensors[0].target='missing';assert.throws(()=>validateLevel(ref));
-  const color=structuredClone(LEVELS[8]);color.sensors=color.sensors.filter(s=>s.type!=='wash');assert.throws(()=>validateLevel(color));
+  const color=structuredClone(LEVELS[16]);color.sensors=color.sensors.filter(s=>s.type!=='wash');assert.throws(()=>validateLevel(color));
 });
 test('缩放遵守密度守恒，质量随面积变化',()=>{const p=new PhysicsService();p.add({id:'ball',type:'circle',x:200,y:200,r:40});const m=p.get('ball').mass;p.scale('ball',.5);assert.ok(Math.abs(p.get('ball').mass/m-.25)<.001);p.dispose();});
-test('固定步长双跑结果一致，九关分别推进 20 秒无 NaN',()=>{
+test('固定步长双跑结果一致，十八关分别推进 20 秒无 NaN',()=>{
   function run(l){const p=new PhysicsService();l.bodies.forEach(b=>p.add(b));l.mechanisms.filter(m=>m.type==='lever').forEach(m=>p.pin(m.bodyId,m.anchor));p.gravity({x:.4,y:.8});for(let i=0;i<1200;i++)p.step();const b=p.get('ball');p.dispose();return [b.x,b.y];}
   for(const l of LEVELS){const a=run(l),b=run(l);assert.ok(a.every(Number.isFinite));assert.deepEqual(a,b);}
 });

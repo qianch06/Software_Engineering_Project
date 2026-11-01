@@ -1,0 +1,13 @@
+{
+  "name": "gravity-shift",
+  "version": "0.2.0",
+  "private": true,
+  "description": "失衡空间：离线物理解谜 · HBuilderX uni-app Vue3",
+  "scripts": {
+    "levels": "node scripts/build-levels.cjs",
+    "test": "node --test tests/core.test.cjs tests/runtime.test.cjs tests/playability.test.cjs",
+    "build:h5": "node scripts/build.cjs h5",
+    "build:app": "node scripts/build.cjs app",
+    "preflight": "node scripts/preflight.cjs"
+  }
+}

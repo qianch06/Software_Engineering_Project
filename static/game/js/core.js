@@ -1,27 +1,71 @@
-(function(root) {
+(function (root) {
   'use strict';
-  const defaults=()=>({version:1,settings:{sensitivity:'mid',sound:true,vibrate:true},completed:{},shards:{},lastLevelId:null});
+  const KEY='gravity-shift-v2',LEGACY='gravity-shift-v1';
+  const defaults=()=>({version:2,settings:{sensitivity:'mid',touchSensitivity:1,sound:true,vibrate:true,controlMode:'manual'},completed:{},shards:{},lastLevelId:null});
+  const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
   class StorageService {
-    constructor(adapter) { this.adapter=adapter; this.warning=''; this.data=defaults(); try {const raw=adapter.getItem('gravity-shift-v1'); if(raw) {const d=JSON.parse(raw); if(d.version!==1||!d.completed||typeof d.completed!=='object'||Array.isArray(d.completed)||!d.settings||typeof d.shards!=='object'||d.shards===null)throw Error('invalid'); this.data={...defaults(),...d,settings:{...defaults().settings,...d.settings}};} }catch(e){this.warning='存档无法读取，已使用临时新进度。';} }
-    save() { try {this.adapter.setItem('gravity-shift-v1',JSON.stringify(this.data));this.warning='';return true;} catch(e){this.warning='保存失败，本次进度暂存于内存。';return false;} }
-    complete(id,time,resets) {const stars=rating(time,resets),old=this.data.completed[id];this.data.completed[id]={stars:Math.max(old?.stars||0,stars),bestTimeMs:Math.min(old?.bestTimeMs??Infinity,time),resets:Math.min(old?.resets??Infinity,resets)};this.data.lastLevelId=null;this.save();return stars;}
-    unlocked(index,levels) {return index===0||!!this.data.completed[levels[index-1].id];}
+    constructor(adapter){this.adapter=adapter;this.warning='';this.data=defaults();try{const raw=adapter.getItem(KEY)||adapter.getItem(LEGACY);if(raw)this.data=StorageService.decode(JSON.parse(raw));}catch(_){this.warning='存档损坏或不可读取，已启用新进度；原始数据未覆盖。';this.corrupt=true;try{const backup=adapter.getItem(KEY+'-backup');if(backup){this.data=StorageService.decode(JSON.parse(backup));this.warning='主存档损坏，已恢复上一次备份。';}}catch(_){}}}
+    static decode(d){
+      if(!object(d)||![1,2].includes(d.version)||!object(d.completed)||!object(d.shards))throw Error('E_SAVE_VERSION');
+      const result=defaults(),s=object(d.settings)?d.settings:{};
+      if(['low','mid','high'].includes(s.sensitivity))result.settings.sensitivity=s.sensitivity;
+      for(const k of ['sound','vibrate'])if(typeof s[k]==='boolean')result.settings[k]=s[k];
+      if([.7,1,1.3].includes(s.touchSensitivity))result.settings.touchSensitivity=s.touchSensitivity;
+      if(['manual','sensor'].includes(s.controlMode))result.settings.controlMode=s.controlMode;
+      for(const [id,r] of Object.entries(d.completed))if(/^[a-z0-9_]+$/.test(id)&&object(r)&&[1,2,3].includes(r.stars)&&Number.isFinite(r.bestTimeMs)&&r.bestTimeMs>=0)result.completed[id]={stars:r.stars,bestTimeMs:r.bestTimeMs,resets:Number.isInteger(r.resets)&&r.resets>=0?r.resets:0};
+      for(const [id,v] of Object.entries(d.shards))if(/^ch[123]_l0[1-5]$/.test(id)&&v===true)result.shards[id]=true;
+      result.lastLevelId=typeof d.lastLevelId==='string'&&/^[a-z0-9_]+$/.test(d.lastLevelId)?d.lastLevelId:null;return result;
+    }
+    save(){try{const wasCorrupt=this.corrupt;if(this.corrupt){const old=this.adapter.getItem(KEY);if(old)this.adapter.setItem(KEY+'-corrupt-backup',old);this.corrupt=false;}const old=this.adapter.getItem(KEY);if(old&&!wasCorrupt)this.adapter.setItem(KEY+'-backup',old);this.adapter.setItem(KEY,JSON.stringify(this.data));this.warning='';return true;}catch(_){this.warning='保存失败，进度暂存于内存，请检查可用空间。';return false;}}
+    complete(id,time,resets,thresholds){const stars=rating(time,resets,thresholds),old=this.data.completed[id];this.data.completed[id]={stars:Math.max(old?.stars||0,stars),bestTimeMs:Math.min(old?.bestTimeMs??Infinity,time),resets:Math.min(old?.resets??Infinity,resets)};this.data.lastLevelId=null;this.save();return stars;}
+    unlocked(index,levels){const l=levels[index];return !!l&&(l.inverse?this.inverseUnlocked():index===0||!!this.data.completed[levels[index-1].id]);}
+    inverseUnlocked(){return Object.keys(this.data.shards).filter(k=>/^ch[123]_l0[1-5]$/.test(k)).length===15;}
+    reset(){const settings=this.data.settings;this.data=defaults();this.data.settings=settings;return this.save();}
   }
-  function rating(time,resets) { return time<=60000&&resets===0?3:time<=90000&&resets<=2?2:1; }
+  function rating(time,resets,thresholds=[60000,90000]){return time<=thresholds[0]&&resets===0?3:time<=thresholds[1]&&resets<=2?2:1;}
   class GravityController {
-    constructor(){this.target={x:0,y:1};this.value={x:0,y:1};this.mode='manual';this.lastSample=0;}
-    sample(x,y,now){if(!Number.isFinite(x+y))return; const a=typeof screen!=='undefined'?(screen.orientation?.angle??window.orientation??90):90;const sign=a===270||a===-90?-1:1;let gx=-y*sign,gy=-x*sign; const mag=Math.hypot(gx,gy);if(mag<0.026)gx=gy=0;const n=Math.max(1,Math.hypot(gx,gy));this.target={x:gx/n,y:gy/n};this.lastSample=now;}
-    update(dt,sensitivity='mid'){const k={low:0.6,mid:1,high:1.5}[sensitivity]||1;const a=1-Math.exp(-dt/200);this.value.x+=(this.target.x*k-this.value.x)*a;this.value.y+=(this.target.y*k-this.value.y)*a;return this.value;}
+    constructor(){this.target={x:0,y:1};this.value={x:0,y:1};this.mode='manual';this.lastSample=0;this.neutral={x:0,y:0};this.raw={x:0,y:0};}
+    sample(x,y,now,angle){if(!Number.isFinite(x)||!Number.isFinite(y))return;angle??=typeof screen!=='undefined'?(screen.orientation?.angle??window.orientation??90):90;const sign=angle===270||angle===-90?-1:1;this.raw={x:-y*sign,y:-x*sign};let gx=this.raw.x-this.neutral.x,gy=this.raw.y-this.neutral.y;if(Math.hypot(gx,gy)<.026)gx=gy=0;const n=Math.max(1,Math.hypot(gx,gy));this.target={x:gx/n,y:gy/n};this.lastSample=now;}
+    calibrate(){this.neutral={...this.raw};this.target={x:0,y:0};}
+    update(dt,sensitivity='mid'){const k={low:.6,mid:1,high:1.5}[sensitivity]||1,a=1-Math.exp(-dt/120);this.value.x+=(this.target.x*k-this.value.x)*a;this.value.y+=(this.target.y*k-this.value.y)*a;return this.value;}
+  }
+  class LinkSystem {
+    constructor(links=[]){this.links=links.map(l=>({...l,active:false,fired:false,until:0,sourceActive:false}));this.time=0;}
+    source(id,active){for(const l of this.links.filter(l=>l.source===id)){const rising=active&&!l.sourceActive;l.sourceActive=active;if(l.semantic==='hold')l.active=active;if(rising&&l.semantic==='once'&&!l.fired){l.active=true;l.fired=true;}if(rising&&l.semantic==='toggle')l.active=!l.active;if(rising&&l.semantic==='pulse'){l.active=true;l.until=this.time+l.durationMs;}}}
+    tick(dt){this.time+=dt;for(const l of this.links)if(l.semantic==='pulse'&&this.time>=l.until)l.active=false;}
+    active(target){return this.links.some(l=>l.target===target&&l.active);}
+  }
+  class Sequence {
+    constructor(expected=[]){this.expected=expected;this.index=0;this.mistake='';}
+    hit(id){if(this.index===this.expected.length)return true;if(id===this.expected[this.index]){this.index++;this.mistake='';return true;}this.mistake=id;return false;}
+    get complete(){return this.index===this.expected.length;}
   }
   function validateLevel(l){
-    if(!l||!/^\w+$/.test(l.id)||!l.name||!Array.isArray(l.bodies)||l.bodies.length>220||!l.collector)throw Error('E_LEVEL_FORMAT');
-    const ids=new Set();for(const b of l.bodies){if(!b.id||ids.has(b.id)||!['rect','circle'].includes(b.type)||!Number.isFinite(b.x+b.y+(b.angle||0))||(b.type==='rect'?!(b.w>0&&b.h>0):!(b.r>0)))throw Error('E_LEVEL_BODY');ids.add(b.id);}
-    if(!ids.has('ball'))throw Error('E_LEVEL_BALL');
-    for(const m of l.mechanisms||[])if(!ids.has(m.bodyId))throw Error('E_LEVEL_REF');
-    if(l.mechanisms?.some(m=>m.type==='spring')&&l.resizable&&(l.scaleRange[0]<0.7||l.scaleRange[1]>1.3))throw Error('E_LEVEL_SCALE');
-    if(l.sensors?.some(s=>s.dye)&&!l.sensors.some(s=>s.type==='wash'))throw Error('E_LEVEL_WASH');
-    for(const z of l.sensors||[])if(z.target&&!ids.has(z.target))throw Error('E_LEVEL_REF');
-    return l;
+    const finite=(...v)=>v.every(Number.isFinite),fail=code=>{throw Error(code+': '+(l?.id||'unknown'));};
+    if(!l||!/^[a-z0-9_]{1,64}$/.test(l.id)||!l.name||!Array.isArray(l.bodies)||l.bodies.length>220||!l.collector)fail('E_LEVEL_FORMAT');
+    const ids=new Set();for(const b of l.bodies){if(!b.id||ids.has(b.id)||!['rect','circle'].includes(b.type)||!finite(b.x,b.y,b.angle??0)||(b.type==='rect'?!finite(b.w,b.h)||b.w<=0||b.h<=0:!finite(b.r)||b.r<=0))fail('E_LEVEL_BODY');if(Math.abs(b.x)>4000||Math.abs(b.y)>4000||b.restitution!=null&&(!finite(b.restitution)||b.restitution<0||b.restitution>1))fail('E_LEVEL_RANGE');ids.add(b.id);}
+    if(!ids.has('ball'))fail('E_LEVEL_BALL');if(!finite(l.collector.x,l.collector.y,l.collector.r)||l.collector.r<=0)fail('E_LEVEL_COLLECTOR');
+    if(l.collector.acceptColor&&!['white','red','yellow','blue'].includes(l.collector.acceptColor))fail('E_LEVEL_COLOR');
+    for(const id of l.draggable||[])if(!ids.has(id)||l.bodies.find(b=>b.id===id).isStatic)fail('E_LEVEL_DRAG');
+    for(const m of l.mechanisms||[]){if(m.type==='lever'&&(!m.anchor||!finite(m.anchor.x,m.anchor.y,m.limit)||m.limit<=0||m.limit>Math.PI/2))fail('E_LEVEL_MECHANISM');if(m.type==='door'&&(!m.anchor||!finite(m.anchor.x,m.anchor.y)||m.openAngle!=null&&!finite(m.openAngle)))fail('E_LEVEL_MECHANISM');if(m.type==='spring'&&(!finite(m.gain)||m.gain<=0||m.gain>24))fail('E_LEVEL_MECHANISM');}
+    if(!Number.isInteger(l.boards)||l.boards<0||l.boards>4||!Number.isInteger(l.lines)||l.lines<0||l.lines>3)fail('E_LEVEL_INVENTORY');
+    if(!l.scaleRange||!finite(...l.scaleRange)||l.scaleRange[0]<.1||l.scaleRange[1]>3||l.scaleRange[0]>1||l.scaleRange[1]<1)fail('E_LEVEL_SCALE');
+    const sources=new Set(),mechanisms=new Set();for(const m of l.mechanisms||[]){if(!['lever','door','spring','pulley'].includes(m.type)||!ids.has(m.bodyId))fail('E_LEVEL_REF');if(m.type==='pulley'&&(!ids.has(m.otherBodyId)||!finite(m.ropeY,m.minY,m.maxY)||m.minY>=m.maxY))fail('E_LEVEL_PULLEY');mechanisms.add(m.bodyId);sources.add(m.bodyId);}
+    if(l.mechanisms?.some(m=>m.type==='spring')&&l.resizable&&(l.scaleRange[0]<.7||l.scaleRange[1]>1.3))fail('E_LEVEL_SCALE');
+    for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
+    if(l.sensors?.some(s=>s.dye)&&!l.sensors.some(s=>s.type==='wash'))fail('E_LEVEL_WASH');
+    for(const link of l.links||[])if(!sources.has(link.source)||!mechanisms.has(link.target)||!['once','hold','toggle','pulse'].includes(link.semantic)||link.semantic==='pulse'&&!(link.durationMs>0))fail('E_LEVEL_LINK');
+    const goal=l.goal||{type:'transport'};if(!['transport','stable','sequence','combo'].includes(goal.type))fail('E_LEVEL_GOAL');for(const id of goal.sequence||[])if(!sources.has(id))fail('E_LEVEL_SEQUENCE');
+    for(const color of goal.colorChain||[])if(!['red','yellow','blue'].includes(color))fail('E_LEVEL_COLOR');
+    if(goal.starTimesMs&&(!finite(...goal.starTimesMs)||goal.starTimesMs.length!==2||goal.starTimesMs[0]<=0||goal.starTimesMs[1]<goal.starTimesMs[0]))fail('E_LEVEL_RATING');
+    if(goal.type==='stable'&&(!goal.stableBodies?.length||goal.stableBodies.some(id=>!ids.has(id))||!(goal.stableForMs>=1000&&goal.stableForMs<=10000)||!goal.zone))fail('E_LEVEL_STABLE');
+    for(const d of l.deathZones||[])if(!finite(d.x,d.y,d.w,d.h)||d.w<=0||d.h<=0)fail('E_LEVEL_DEATH');return l;
   }
-  root.GameCore={StorageService,GravityController,rating,validateLevel};
+  function inverseLevel(source){
+    const l=JSON.parse(JSON.stringify(source));l.id='inv_'+source.id;l.inverse=true;l.baseId=source.id;l.name+=' · 倒映';l.chapter='倒映章 · 镜中的归途';const mirror=b=>{b.x=1920-b.x;if(b.angle!=null)b.angle=-b.angle;};
+    l.bodies.forEach(mirror);mirror(l.collector);delete l.shard;if(l.bridgeGuide)mirror(l.bridgeGuide);for(const z of l.sensors||[]){mirror(z);if(z.force)z.force.x*=-1;}for(const d of l.deathZones||[])mirror(d);
+    for(const m of l.mechanisms||[]){if(m.anchor)mirror(m.anchor);if(m.type==='door')m.openAngle=-(m.openAngle??-Math.PI/2);if(m.type==='spring')m.gain*=.9;}
+    if(l.goal?.zone)mirror(l.goal.zone);l.boards=Math.max(l.boards?1:0,l.boards-1);l.lines=Math.max(l.lines?1:0,l.lines-1);l.initialGravity={x:-.25,y:.95};l.hint='镜像空间：道路与机关左右翻转，工具数量减少。'+l.hint;return validateLevel(l);
+  }
+  root.GameCore={StorageService,GravityController,rating,validateLevel,LinkSystem,Sequence,inverseLevel};
 })(typeof window!=='undefined'?window:globalThis);

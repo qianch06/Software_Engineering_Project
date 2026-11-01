@@ -85,7 +85,20 @@
       "向右拖动重力圆盘",
       "保持右下重力，让球沿斜坡滚动",
       "送入绿色收集器"
-    ]
+    ],
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
   },
   {
     "boards": 2,
@@ -199,6 +212,19 @@
       "x": 1020,
       "y": 790,
       "w": 320
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
@@ -297,7 +323,20 @@
       "捏合小球，缩小到 0.5 倍",
       "选择画线，在空白处画一道坡",
       "穿过窄缝，抵达收集器"
-    ]
+    ],
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
   },
   {
     "boards": 0,
@@ -395,6 +434,19 @@
     "shard": {
       "x": 1000,
       "y": 460
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
@@ -493,6 +545,19 @@
     "shard": {
       "x": 1010,
       "y": 540
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
@@ -528,7 +593,7 @@
         "target": "gate"
       }
     ],
-    "hint": "让球经过青色光束，激活开关。沿流光观察远处的门如何打开。",
+    "hint": "经过青色激光切换门的开合；再次经过会关闭。观察流光，先确认门的状态。",
     "id": "ch1_l03",
     "name": "光的回声",
     "chapter": "第一章 · 引力之间",
@@ -598,6 +663,28 @@
     "shard": {
       "x": 1350,
       "y": 480
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ],
+      "sequence": [
+        "beam"
+      ]
+    },
+    "links": [
+      {
+        "source": "beam",
+        "target": "gate",
+        "semantic": "toggle"
+      }
+    ],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
@@ -700,6 +787,19 @@
     "shard": {
       "x": 1120,
       "y": 320
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
@@ -838,64 +938,49 @@
       "x": 860,
       "y": 790,
       "w": 320
+    },
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "links": [],
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
     }
   },
   {
-    "boards": 0,
+    "id": "ch2_l01",
+    "name": "悬空的答案",
+    "chapter": "第二章 · 空间的形状",
+    "tag": "搭桥 / 缺口",
+    "intro": "先观察虚线缺口。将两块木板连接成桥，木板放置后固定。",
+    "boards": 2,
     "lines": 0,
     "scaleRange": [
       0.4,
       2
     ],
     "collector": {
-      "x": 1670,
-      "y": 735,
-      "r": 62,
-      "acceptColor": "blue"
+      "x": 1680,
+      "y": 745,
+      "r": 68
     },
     "mechanisms": [],
-    "sensors": [
-      {
-        "id": "red",
-        "type": "laser",
-        "x": 570,
-        "y": 635,
-        "w": 16,
-        "h": 350,
-        "dye": "red"
-      },
-      {
-        "id": "wash",
-        "type": "wash",
-        "x": 850,
-        "y": 650,
-        "w": 150,
-        "h": 330
-      },
-      {
-        "id": "blue",
-        "type": "laser",
-        "x": 1190,
-        "y": 635,
-        "w": 16,
-        "h": 350,
-        "dye": "blue"
-      }
-    ],
-    "hint": "依次穿过红光、白色洗色区、蓝光。球会保留最后染上的颜色，蓝色收集器只接受蓝球。",
-    "id": "demo_color",
-    "name": "三色回廊 · 预览",
-    "chapter": "实验室 · 光的颜色",
-    "tag": "染色 / 洗色 / 过滤",
-    "intro": "光会留下颜色。只有同色的光，能够找到归宿。",
+    "sensors": [],
+    "links": [],
     "bodies": [
       {
         "id": "left",
         "type": "rect",
         "x": 30,
-        "y": 525,
+        "y": 540,
         "w": 60,
-        "h": 790,
+        "h": 780,
         "isStatic": true,
         "category": "terrain"
       },
@@ -903,9 +988,9 @@
         "id": "right",
         "type": "rect",
         "x": 1890,
-        "y": 525,
+        "y": 540,
         "w": 60,
-        "h": 790,
+        "h": 780,
         "isStatic": true,
         "category": "terrain"
       },
@@ -913,7 +998,224 @@
         "id": "ceiling",
         "type": "rect",
         "x": 960,
-        "y": 125,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "start",
+        "type": "rect",
+        "x": 350,
+        "y": 850,
+        "w": 640,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "end",
+        "type": "rect",
+        "x": 1520,
+        "y": 850,
+        "w": 740,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "hint": "先观察虚线缺口。将两块木板连接成桥，木板放置后固定。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1100,
+      "y": 380
+    },
+    "deathZones": [
+      {
+        "x": 920,
+        "y": 970,
+        "w": 480,
+        "h": 80
+      }
+    ],
+    "bridgeGuide": {
+      "x": 920,
+      "y": 790,
+      "w": 480
+    },
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch2_l02",
+    "name": "画出一条归途",
+    "chapter": "第二章 · 空间的形状",
+    "tag": "画线 / 导流",
+    "intro": "画一道缓坡越过红色危险区。单条线限长，但可以分段连接。",
+    "boards": 1,
+    "lines": 3,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "start",
+        "type": "rect",
+        "x": 300,
+        "y": 810,
+        "w": 540,
+        "h": 50,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "end",
+        "type": "rect",
+        "x": 1500,
+        "y": 810,
+        "w": 720,
+        "h": 50,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "hint": "画一道缓坡越过红色危险区。单条线限长，但可以分段连接。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1100,
+      "y": 500
+    },
+    "deathZones": [
+      {
+        "x": 870,
+        "y": 860,
+        "w": 560,
+        "h": 75
+      }
+    ],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch2_l03",
+    "name": "尺度之外",
+    "chapter": "第二章 · 空间的形状",
+    "tag": "缩放 / 窄缝",
+    "intro": "把能量球缩小至 0.5 倍，穿过中央窄缝。缩放保持密度，质量随面积改变。",
+    "boards": 0,
+    "lines": 2,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
         "w": 1860,
         "h": 30,
         "isStatic": true,
@@ -932,12 +1234,1017 @@
       {
         "id": "ball",
         "type": "circle",
-        "x": 260,
-        "y": 620,
+        "x": 250,
+        "y": 600,
+        "r": 48,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "wallTop",
+        "type": "rect",
+        "x": 980,
+        "y": 450,
+        "w": 50,
+        "h": 540,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "wallBottom",
+        "type": "rect",
+        "x": 980,
+        "y": 825,
+        "w": 50,
+        "h": 100,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "hint": "把能量球缩小至 0.5 倍，穿过中央窄缝。缩放保持密度，质量随面积改变。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1280,
+      "y": 500
+    },
+    "deathZones": [],
+    "resizable": true,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch2_l04",
+    "name": "等长的两端",
+    "chapter": "第二章 · 空间的形状",
+    "tag": "滑轮 / 质量",
+    "intro": "左侧托盘较重，会下降并抬升右盘。把球送到右盘，再向右抵达高台。两端移动距离相同。",
+    "boards": 2,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1650,
+      "y": 470,
+      "r": 68
+    },
+    "mechanisms": [
+      {
+        "type": "pulley",
+        "bodyId": "trayA",
+        "otherBodyId": "trayB",
+        "ropeY": 1400,
+        "minY": 580,
+        "maxY": 820,
+        "anchor": {
+          "x": 855,
+          "y": 300
+        }
+      }
+    ],
+    "sensors": [],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
         "r": 30,
         "category": "energyBall",
-        "restitution": 0.18
+        "restitution": 0.12
+      },
+      {
+        "id": "trayA",
+        "type": "rect",
+        "x": 650,
+        "y": 620,
+        "w": 260,
+        "h": 24,
+        "isStatic": false,
+        "category": "pulley",
+        "density": 0.009,
+        "lockRotation": true
+      },
+      {
+        "id": "trayB",
+        "type": "rect",
+        "x": 1060,
+        "y": 780,
+        "w": 260,
+        "h": 24,
+        "isStatic": false,
+        "category": "pulley",
+        "density": 0.003,
+        "lockRotation": true
+      },
+      {
+        "id": "shelf",
+        "type": "rect",
+        "x": 1640,
+        "y": 575,
+        "w": 400,
+        "h": 32,
+        "isStatic": true,
+        "category": "terrain"
       }
+    ],
+    "hint": "左侧托盘较重，会下降并抬升右盘。把球送到右盘，再向右抵达高台。两端移动距离相同。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1100,
+      "y": 420
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch2_l05",
+    "name": "静止的秩序",
+    "chapter": "第二章 · 空间的形状",
+    "tag": "搬运 / 堆叠 / 稳定",
+    "intro": "直接拖动三个方块，把它们叠进右侧虚线区域；松手后保持稳定 3 秒。重力朝下最稳。",
+    "boards": 0,
+    "lines": 2,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68
+    },
+    "mechanisms": [],
+    "sensors": [],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "cube1",
+        "type": "rect",
+        "x": 300,
+        "y": 690,
+        "w": 78,
+        "h": 78,
+        "isStatic": false,
+        "category": "taskCube",
+        "friction": 0.8,
+        "restitution": 0,
+        "frictionAir": 0.05
+      },
+      {
+        "id": "cube2",
+        "type": "rect",
+        "x": 510,
+        "y": 690,
+        "w": 78,
+        "h": 78,
+        "isStatic": false,
+        "category": "taskCube",
+        "friction": 0.8,
+        "restitution": 0,
+        "frictionAir": 0.05
+      },
+      {
+        "id": "cube3",
+        "type": "rect",
+        "x": 720,
+        "y": 690,
+        "w": 78,
+        "h": 78,
+        "isStatic": false,
+        "category": "taskCube",
+        "friction": 0.8,
+        "restitution": 0,
+        "frictionAir": 0.05
+      }
+    ],
+    "hint": "直接拖动三个方块，把它们叠进右侧虚线区域；松手后保持稳定 3 秒。重力朝下最稳。",
+    "goal": {
+      "type": "stable",
+      "stableBodies": [
+        "cube1",
+        "cube2",
+        "cube3"
+      ],
+      "stableForMs": 3000,
+      "zone": {
+        "x": 1500,
+        "y": 650,
+        "w": 140,
+        "h": 340
+      },
+      "starTimesMs": [
+        90000,
+        150000
+      ]
+    },
+    "shard": {
+      "x": 1120,
+      "y": 450
+    },
+    "deathZones": [],
+    "draggable": [
+      "cube1",
+      "cube2",
+      "cube3"
+    ],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch3_l01",
+    "name": "光门的时限",
+    "chapter": "第三章 · 光的回廊",
+    "tag": "激光 / 脉冲门",
+    "intro": "触碰青色光束，门会打开 4 秒。错过可以返回光束再次触发，不会永久锁死。",
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68
+    },
+    "mechanisms": [
+      {
+        "type": "door",
+        "bodyId": "gate",
+        "anchor": {
+          "x": 1190,
+          "y": 515
+        }
+      }
+    ],
+    "sensors": [
+      {
+        "id": "beam",
+        "type": "laser",
+        "x": 680,
+        "y": 650,
+        "w": 18,
+        "h": 330
+      },
+      {
+        "id": "plate",
+        "type": "pressure",
+        "x": 930,
+        "y": 790,
+        "w": 170,
+        "h": 35
+      }
+    ],
+    "links": [
+      {
+        "source": "beam",
+        "target": "gate",
+        "semantic": "pulse",
+        "durationMs": 4000
+      },
+      {
+        "source": "plate",
+        "target": "gate",
+        "semantic": "hold"
+      }
+    ],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "gate",
+        "type": "rect",
+        "x": 1190,
+        "y": 665,
+        "w": 30,
+        "h": 300,
+        "isStatic": true,
+        "category": "door"
+      },
+      {
+        "id": "weight",
+        "type": "rect",
+        "x": 430,
+        "y": 690,
+        "w": 82,
+        "h": 82,
+        "isStatic": false,
+        "category": "taskCube",
+        "friction": 0.8,
+        "restitution": 0,
+        "density": 0.004
+      }
+    ],
+    "hint": "触碰青色光束，门会打开 4 秒。错过可以返回光束再次触发，不会永久锁死。 也可以直接拖动方块压住压力开关，使门保持打开。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ],
+      "sequence": [
+        "beam"
+      ]
+    },
+    "shard": {
+      "x": 1100,
+      "y": 380
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "draggable": [
+      "weight"
     ]
+  },
+  {
+    "id": "ch3_l02",
+    "name": "逆流而上",
+    "chapter": "第三章 · 光的回廊",
+    "tag": "局部重力 / 高台",
+    "intro": "紫色区域内重力朝上，离开后恢复全局重力。利用力场将球送到右侧高台。",
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1650,
+      "y": 430,
+      "r": 68
+    },
+    "mechanisms": [],
+    "sensors": [
+      {
+        "id": "field",
+        "type": "gravityField",
+        "x": 1070,
+        "y": 645,
+        "w": 380,
+        "h": 330,
+        "force": {
+          "x": 0.15,
+          "y": -1.5
+        }
+      }
+    ],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "shelf",
+        "type": "rect",
+        "x": 1640,
+        "y": 540,
+        "w": 400,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      }
+    ],
+    "hint": "紫色区域内重力朝上，离开后恢复全局重力。利用力场将球送到右侧高台。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1200,
+      "y": 350
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch3_l03",
+    "name": "水流的方向",
+    "chapter": "第三章 · 光的回廊",
+    "tag": "水流 / 受力",
+    "intro": "蓝色水域持续向右上方推动物体。水流加速度与质量无关，入口边缘平滑过渡。",
+    "boards": 1,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68
+    },
+    "mechanisms": [],
+    "sensors": [
+      {
+        "id": "water",
+        "type": "water",
+        "x": 1070,
+        "y": 670,
+        "w": 800,
+        "h": 280,
+        "force": {
+          "x": 1.2,
+          "y": -0.4
+        }
+      }
+    ],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "bump",
+        "type": "rect",
+        "x": 1200,
+        "y": 785,
+        "w": 180,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain",
+        "angle": -0.18
+      }
+    ],
+    "hint": "蓝色水域持续向右上方推动物体。水流加速度与质量无关，入口边缘平滑过渡。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ]
+    },
+    "shard": {
+      "x": 1400,
+      "y": 420
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch3_l04",
+    "name": "三色回廊",
+    "chapter": "第三章 · 光的回廊",
+    "tag": "染色 / 洗色 / 颜色链",
+    "intro": "按红 → 黄 → 蓝经过光束。洗色区只清除当前颜色，已完成的顺序保留。蓝球才能入仓。",
+    "boards": 0,
+    "lines": 0,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68,
+      "acceptColor": "blue"
+    },
+    "mechanisms": [],
+    "sensors": [
+      {
+        "id": "red",
+        "type": "laser",
+        "x": 500,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "red"
+      },
+      {
+        "id": "yellow",
+        "type": "laser",
+        "x": 850,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "yellow"
+      },
+      {
+        "id": "wash",
+        "type": "wash",
+        "x": 1070,
+        "y": 650,
+        "w": 130,
+        "h": 330
+      },
+      {
+        "id": "blue",
+        "type": "laser",
+        "x": 1260,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "blue"
+      }
+    ],
+    "links": [],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      }
+    ],
+    "hint": "按红 → 黄 → 蓝经过光束。洗色区只清除当前颜色，已完成的顺序保留。蓝球才能入仓。",
+    "goal": {
+      "type": "transport",
+      "starTimesMs": [
+        60000,
+        90000
+      ],
+      "colorChain": [
+        "red",
+        "yellow",
+        "blue"
+      ]
+    },
+    "shard": {
+      "x": 1450,
+      "y": 450
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  {
+    "id": "ch3_l05",
+    "name": "回廊的回声",
+    "chapter": "第三章 · 光的回廊",
+    "tag": "顺序链 / 水流 / 染色门",
+    "intro": "依次触发 A 红光、B 黄光、C 蓝光，解锁最后的门。错序只会留下提示，可返回补全。",
+    "boards": 1,
+    "lines": 2,
+    "scaleRange": [
+      0.4,
+      2
+    ],
+    "collector": {
+      "x": 1680,
+      "y": 745,
+      "r": 68,
+      "acceptColor": "blue"
+    },
+    "mechanisms": [
+      {
+        "type": "door",
+        "bodyId": "gate",
+        "anchor": {
+          "x": 1490,
+          "y": 515
+        },
+        "requireSequence": true
+      }
+    ],
+    "sensors": [
+      {
+        "id": "A",
+        "type": "laser",
+        "x": 460,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "red"
+      },
+      {
+        "id": "B",
+        "type": "laser",
+        "x": 770,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "yellow"
+      },
+      {
+        "id": "wash",
+        "type": "wash",
+        "x": 970,
+        "y": 650,
+        "w": 120,
+        "h": 330
+      },
+      {
+        "id": "C",
+        "type": "laser",
+        "x": 1210,
+        "y": 640,
+        "w": 18,
+        "h": 340,
+        "dye": "blue"
+      },
+      {
+        "id": "flow",
+        "type": "water",
+        "x": 1000,
+        "y": 720,
+        "w": 700,
+        "h": 160,
+        "force": {
+          "x": 0.5,
+          "y": 0
+        }
+      }
+    ],
+    "links": [
+      {
+        "source": "C",
+        "target": "gate",
+        "semantic": "once"
+      }
+    ],
+    "bodies": [
+      {
+        "id": "left",
+        "type": "rect",
+        "x": 30,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "right",
+        "type": "rect",
+        "x": 1890,
+        "y": 540,
+        "w": 60,
+        "h": 780,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ceiling",
+        "type": "rect",
+        "x": 960,
+        "y": 150,
+        "w": 1860,
+        "h": 30,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "floor",
+        "type": "rect",
+        "x": 960,
+        "y": 850,
+        "w": 1860,
+        "h": 70,
+        "isStatic": true,
+        "category": "terrain"
+      },
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 250,
+        "y": 600,
+        "r": 30,
+        "category": "energyBall",
+        "restitution": 0.12
+      },
+      {
+        "id": "gate",
+        "type": "rect",
+        "x": 1490,
+        "y": 665,
+        "w": 30,
+        "h": 300,
+        "isStatic": true,
+        "category": "door"
+      }
+    ],
+    "hint": "依次触发 A 红光、B 黄光、C 蓝光，解锁最后的门。错序只会留下提示，可返回补全。",
+    "goal": {
+      "type": "sequence",
+      "sequence": [
+        "A",
+        "B",
+        "C"
+      ],
+      "colorChain": [
+        "red",
+        "yellow",
+        "blue"
+      ],
+      "starTimesMs": [
+        90000,
+        150000
+      ]
+    },
+    "shard": {
+      "x": 1320,
+      "y": 420
+    },
+    "deathZones": [],
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    }
   }
 ]
