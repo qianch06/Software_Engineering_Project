@@ -48,10 +48,10 @@
     "statusbar": {
       "immersed": true,
       "style": "light",
-      "background": "#101f25"
+      "background": "#050b14"
     },
     "safearea": {
-      "background": "#101f25",
+      "background": "#050b14",
       "bottom": {
         "offset": "none"
       }

@@ -5,4 +5,4 @@ export default { onLaunch() {
   // #endif
 } }
 </script>
-<style>page { background:#101f25; height:100%; overflow:hidden; }</style>
+<style>page { background:#050b14; height:100%; overflow:hidden; }</style>
