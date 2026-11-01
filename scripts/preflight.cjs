@@ -6,7 +6,9 @@ if(/location\.replace/.test(fs.readFileSync(path.join(root,'index.html'),'utf8')
 if(m.vueVersion!=='3')issues.push('需配置 Vue3');
 if(!m['app-plus'].orientation.includes('landscape-primary'))issues.push('缺少横屏配置');
 if(m.uniStatistics?.enable!==false)issues.push('应关闭非必要的 uni 统计');
-if(cloud&&(!/^__UNI__[A-Z0-9]{7}$/.test(m.appid)||m.appid==='__UNI__GRAVITYSHIFT'))issues.push('manifest.json 的 appid 尚未绑定：请登录 HBuilderX，点击“获取/重新获取 DCloud AppID”，使用自己账号创建的真实 AppID。');
+if(cloud&&!/^__UNI__[A-Z0-9]{7}$/.test(m.appid))issues.push('AppID 尚未生成：无需发送给开发人员。请在已登录的 HBuilderX 中打开本项目 manifest.json → 基础配置 → 应用标识（AppID）→ 获取/重新获取，再选择 Android 云打包。');
+if(m['app-plus'].distribute.ios)issues.push('当前项目仅支持 Android 云打包；请移除 iOS 发布配置');
+for(const icon of Object.values(m['app-plus'].distribute.icons?.android||{}))if(!fs.existsSync(path.join(root,icon)))issues.push('Android 图标文件缺失：'+icon);
 if(!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2,}$/.test(m['app-plus'].distribute.android.packagename))issues.push('Android 包名格式不正确');
 require('../static/game/js/core.js');const levels=JSON.parse(fs.readFileSync(path.join(root,'static/game/data/levels.json'),'utf8'));levels.forEach(GameCore.validateLevel);
 console.log('关卡校验通过：'+levels.length+' 基础关卡。');
