@@ -24,14 +24,13 @@ function bridge(id,name,chapter,{two=false,draw=false,small=false}={}){
  if(small){l.resizable=true;l.lines=1;l.boards=0;l.tag='缩放 / 窄缝 / 导流';l.bodies.push(rect('wallTop',650,370,18,270));l.intro='先把球缩小到 0.45 倍穿过窄缝，再画坡连接缺口。';l.hint='用 − 或双指捏合缩小球；上方墙体封住了绕行路线。缩放和画线都在释放前完成。';actions=[scale(.45),line([818,590],[1102,670])];}
  return add(l,actions);
 }
-function lever(id,name,chapter,combo=false){
+function lever(id,name,chapter){
  const l=base(id,name,chapters[chapter]);l.tag='配重 / 跷跷板';l.boards=1;
  l.bodies.push(ball(555,680),rect('lever',720,720,500,22,{isStatic:false,category:'lever',density:.003,friction:.1,frictionAir:.01}),cube('weight',340,790,60,.035),rect('rack',340,830,160,20),ramp('end',980,640,1730,670));
  l.collector={x:1640,y:600,r:64};l.mechanisms=[{type:'lever',bodyId:'lever',anchor:{x:720,y:720},limit:.55}];
  l.draggable=['weight'];l.placementZones.weight=[{x:340,y:790,w:150,h:65},{x:900,y:679,w:150,h:65}];
  l.buildAreas=[{x:800,y:650,w:400,h:240}];l.boardSpec={w:300,h:18};
- l.intro='把右侧配重移到跷跷板长臂的金色框内。左端托球上升，再用木板承接出口。';l.hint='先把配重放到右端（会吸附到板面），再搭出口斜板。球不能直接拖动；缺少配重就没有托举的能量。';
- if(combo){l.tag='配重 / 弹射 / 承接';l.bodies.push(rect('spring',1040,650,140,22,{category:'spring'}));l.mechanisms.push({type:'spring',bodyId:'spring',gain:14,direction:{x:.45,y:-Math.sqrt(1-.45**2)}});l.shard={x:1640,y:600};}
+ l.intro='把架子上的配重移到跷跷板另一端的金色框内。球端被抬起，再用木板承接出口。';l.hint='复习序章的配重，再结合上一关的搭桥：先放配重，再搭出口斜板。球不能直接拖动；缺少配重就没有托举的能量。';
  return add(l,[place('weight',940,679),board(780,645,-.08)]);
 }
 function gate(id,name,chapter,pulse=false,colors=false){
@@ -43,18 +42,46 @@ function gate(id,name,chapter,pulse=false,colors=false){
  if(pulse){l.sensors.push({id:'beam',type:'laser',x:600,y:580,w:18,h:500});l.links.push({source:'beam',target:'gate',semantic:'pulse',durationMs:4000});l.intro='球经过光束后门打开 4 秒；也可先用配重压住压力开关。';}
  return add(l,pulse?[]:[place('weight',500,800)]);
 }
+function echoGate(l,x,y,h){
+ l.bodies.push(rect('gate',1450,540,24,600,{category:'door'}));
+ l.mechanisms.push({type:'door',bodyId:'gate',anchor:{x:1450,y:240},openAngle:-Math.PI/2});
+ l.sensors.push({id:'echo',type:'laser',x,y,w:18,h});l.links.push({source:'echo',target:'gate',semantic:'once'});
+}
 function spring(id,name,chapter){
  const l=base(id,name,chapters[chapter]);l.tag='弹簧 / 高台 / 承接';l.bodies.push(ball(300,350),ramp('start',230,450,650,690),rect('spring',730,790,180,22,{category:'spring'}),ramp('end',1280,680,1730,800));l.mechanisms=[{type:'spring',bodyId:'spring',gain:14,direction:{x:.45,y:-Math.sqrt(1-.45**2)}}];l.buildAreas=[{x:1130,y:640,w:360,h:190}];l.boardSpec={w:290,h:18};l.intro='球落到弹簧板后会跃向高处；先在出口布好承接木板。';l.hint='弹簧是向右上方的固定动力。把木板放在高台左侧并向右下倾斜，接住下落的球。';return add(l,[board(1130,640,Math.atan2(80,300))]);
 }
-bridge('tut_grav','第一道斜坡',0);
-lever('tut_mech','支点与桥',0);
-bridge('tut_hand','小一点，近一点',0,{small:true});
-levels.slice(0,3).forEach(l=>{l.tutorial=[l.intro,'准备阶段搭建，绿色预览可以放置；红色表示重叠或越界。','点击「释放」观察；路径中断时返回准备，方案会保留。'];});
+{
+ const l=bridge('tut_grav','第一道斜坡',0);l.defaultBoardAngle=Math.atan2(80,320);l.lesson={kind:'board',target:{x:960,y:630},angle:l.defaultBoardAngle,radius:100};
+ l.intro='只学一件事：放一块木板，再释放小球。';l.hint='点左下「木板」，把木板拖到虚线板位置后松手。角度已调好，靠近会自动对齐；再点右下「释放」。';
+ l.tutorial=['① 点左下「木板」，拖到虚线板处松手；角度已调好，靠近会自动对齐。','② 木板已放下。点右下「释放」，看看小球怎样沿桥滚下。','③ 观察：重力始终向下，桥面把下落的小球引到收集器。'];
+}
+{
+ const l=lever('tut_mech','配重的力量',0);l.boards=0;l.lines=0;l.buildAreas=[];l.tag='配重入门 / 自动吸附';l.bodies.push(rect('tutorialBridge',780,645,300,18,{angle:-.08,category:'wood'}));l.placementZones.weight=[{x:340,y:790,w:150,h:65},{x:940,y:679,w:110,h:90}];l.lesson={kind:'weight',sourceId:'weight',target:{x:940,y:679},radius:95};solutions[l.id]=[place('weight',940,679)];
+ l.intro='桥已经搭好。这一关只需把配重拖到跷跷板右端。';l.hint='拖动左下方发光的方块，到跷跷板右端的金色方框后松手，会自动吸附。点「释放」：右端下沉，左端把球抬起来，球会沿现成的桥抵达终点。';
+ l.tutorial=['① 把左下方发光的「配重」拖到右侧金色框，松手自动吸附；不用搭桥。','② 配重已就位！右端下沉会抬起左端小球。点右下「释放」试试看。','③ 看跷跷板：配重端下降 → 小球端上升 → 小球沿现成的桥入仓。'];
+}
+{
+ const l=bridge('tut_hand','画一段归途',0,{draw:true});l.lines=1;l.lesson={kind:'line',path:[{x:818,y:590},{x:1102,y:670}]};l.tag='画线入门 / 沿线练习';
+ l.intro='沿虚线画一段缓坡，再释放小球。这一关不用缩放。';l.hint='点「画线」，从虚线左侧圆点画到右侧圆点，松手生成桥面；线不要穿入平台。点「释放」观察。缩放会在第二章单独介绍。';
+ l.tutorial=['① 点左下「画线」，沿两个圆点之间的虚线画一笔，松手生成缓坡。','② 导流线已生成。点「释放」，让小球沿你画的坡滚过去。','③ 画线也能承接和导流。以后可以自己决定坡度与画法。'];
+}
+levels.slice(0,3).forEach(l=>{l.goal.starTimesMs=[300000,600000];});
 bridge('ch1_l01','微光的轨迹',1);
 lever('ch1_l02','两端之间',1);
-gate('ch1_l03','光的回声',1);
+{
+ const l=bridge('ch1_l03','光的回声',1);echoGate(l,650,510,180);
+ l.tag='搭桥 / 光束开门';l.intro='小球穿过光束，远处的门会亮起并打开——这是光的回应。先搭桥接好后半段道路。';
+ l.hint='沿用第一关的搭桥方法；虚线连接光束与门。球碰到光束后门持续开启，无需抢时间，也不用配重。';
+ l.tutorial=['① 复习搭桥：旋转木板接住缺口；新知识是光束会向远处的门传信。','② 检查桥面两端，再释放。球穿过光束，门会回应并保持开启。','③ 观察光束与门之间的亮点：光被触发 → 门打开 → 小球过桥入仓。'];
+}
 spring('ch1_l04','向上的可能',1);
-lever('ch1_l05','万物相连',1,true);
+{
+ const l=spring('ch1_l05','万物相连',1);l.boards=0;l.lines=1;echoGate(l,1210,610,160);
+ l.tag='综合 / 弹簧 → 画线 → 光门';l.intro='把学过的机关连成一条路：弹簧把球送上来，画线承接，球穿过光束后打开终点门。';
+ l.hint='紫色的是实体弹簧板。沿建造区画一段右低左高的缓坡，接住弹起的球并送过右端光束。光门持续开启，不考反应速度。';
+ l.tutorial=['① 综合练习：用序章的画线方法，在建造区接一段缓坡；紫色弹簧负责把球送上来。','② 检查导流线是否接住落点并通往光束，再释放。无需配重，也不需要新操作。','③ 看整条链：弹簧抬升 → 导流线承接 → 光束传信 → 门开启 → 入仓。'];
+ solutions[l.id]=[line([990,603],[1270,677])];
+}
 bridge('ch2_l01','悬空的答案',2,{two:true});
 bridge('ch2_l02','画出一条归途',2,{draw:true});
 bridge('ch2_l03','尺度之外',2,{small:true});
