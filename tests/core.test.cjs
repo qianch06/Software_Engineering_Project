@@ -1,5 +1,13 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const{levels,scene,solutions,action}=require('./helpers.cjs');
+test('管理员模式持久解锁全部33关，关闭后保留真实进度并恢复门槛',()=>{
+ const map=new Map(),s=new GameCore.StorageService(adapter(map)),all=[...levels,...levels.filter(l=>l.id.startsWith('ch')).map(GameCore.inverseLevel)];
+ assert.equal(s.data.settings.adminMode,false);assert.equal(s.unlocked(17,all),false);assert.equal(s.inverseUnlocked(),false);
+ s.complete('tut_grav',1000,0);s.data.shards.ch1_l01=true;const records=JSON.stringify({completed:s.data.completed,shards:s.data.shards});
+ s.data.settings.adminMode=true;s.save();const restored=new GameCore.StorageService(adapter(map));
+ assert.equal(all.length,33);all.forEach((_,i)=>assert.equal(restored.unlocked(i,all),true));assert.equal(restored.inverseUnlocked(),true);assert.equal(restored.unlocked(33,all),false);
+ restored.data.settings.adminMode=false;restored.save();const off=new GameCore.StorageService(adapter(map));assert.equal(off.unlocked(1,all),true);assert.equal(off.unlocked(17,all),false);assert.equal(off.inverseUnlocked(),false);assert.equal(JSON.stringify({completed:off.data.completed,shards:off.data.shards}),records);
+});
 test('18 个关卡使用新规则；离线脚本与 JSON 同步',()=>{require('../static/game/js/levels.js');assert.deepEqual(LEVELS,levels);assert.equal(levels.length,18);levels.forEach(l=>assert.equal(GameCore.validateLevel(l),l));});
 test('校验拒绝旧规则、可变重力、非法工具区和未授权方块',()=>{for(const mutate of [l=>delete l.rulesVersion,l=>l.initialGravity.x=1,l=>l.buildAreas=[],l=>l.boardSpec.w=NaN,l=>{l.draggable=['ball'];l.placementZones.ball=[{x:300,y:400,w:200,h:200}];}]){const l=structuredClone(levels[0]);mutate(l);assert.throws(()=>GameCore.validateLevel(l));}});
 test('只有指定升流井关可有固定向上的局部场',()=>{const l=structuredClone(levels.find(l=>l.id==='ch3_l02'));l.sensors[0].force.x=.1;assert.throws(()=>GameCore.validateLevel(l));l.sensors[0].force.x=0;l.id='ch1_l01';assert.throws(()=>GameCore.validateLevel(l));});
