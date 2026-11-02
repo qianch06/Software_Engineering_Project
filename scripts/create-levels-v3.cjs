@@ -33,15 +33,6 @@ function lever(id,name,chapter){
  l.intro='把架子上的配重移到跷跷板另一端的金色框内。球端被抬起，再用木板承接出口。';l.hint='复习序章的配重，再结合上一关的搭桥：先放配重，再搭出口斜板。球不能直接拖动；缺少配重就没有托举的能量。';
  return add(l,[place('weight',940,679),board(780,645,-.08)]);
 }
-function gate(id,name,chapter,pulse=false,colors=false){
- const l=base(id,name,chapters[chapter]);l.boards=0;l.tag=pulse?'激光 / 4秒光门':'配重 / 保持开关';
- l.bodies.push(ball(300,350),ramp('road',230,450,1730,820),rect('gate',1120,570,26,480,{category:'door'}),cube('weight',300,800),rect('rack',300,840,140,20),rect('plateShelf',500,840,180,20));
- l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1120,y:330},openAngle:-Math.PI/2}];
- l.sensors=[{id:'plate',type:'pressure',x:500,y:805,w:140,h:55}];l.links=[{source:'plate',target:'gate',semantic:'hold'}];l.draggable=['weight'];l.placementZones.weight=[{x:300,y:800,w:140,h:65},{x:500,y:800,w:140,h:65}];l.buildAreas=[];
- l.intro='准备阶段把方块放到金色压力台，释放后让门保持开启。';l.hint='球沿斜坡滚下，压力台需要方块持续压住。门与上方墙体封住了旁路。';
- if(pulse){l.sensors.push({id:'beam',type:'laser',x:600,y:580,w:18,h:500});l.links.push({source:'beam',target:'gate',semantic:'pulse',durationMs:4000});l.intro='球经过光束后门打开 4 秒；也可先用配重压住压力开关。';}
- return add(l,pulse?[]:[place('weight',500,800)]);
-}
 function echoGate(l,x,y,h){
  l.bodies.push(rect('gate',1450,540,24,600,{category:'door'}));
  l.mechanisms.push({type:'door',bodyId:'gate',anchor:{x:1450,y:240},openAngle:-Math.PI/2});
@@ -83,24 +74,63 @@ spring('ch1_l04','向上的可能',1);
  solutions[l.id]=[line([990,603],[1270,677])];
 }
 bridge('ch2_l01','悬空的答案',2,{two:true});
-bridge('ch2_l02','画出一条归途',2,{draw:true});
+function steppingRoute(id,name,chapter){
+ const l=base(id,name,chapters[chapter]);l.boards=0;l.lines=2;
+ l.bodies.push(ball(300,350),ramp('start',230,450,650,520),ramp('island',900,600,1080,640),ramp('end',1330,710,1730,820));
+ l.buildAreas=[{x:775,y:570,w:280,h:180},{x:1205,y:685,w:280,h:180}];
+ l.tag='分段画线 / 中途承接';l.intro='归途分成两段：先画线接到中间落脚台，再画第二段通往终点。';l.hint='沿用序章画线操作。中间平台负责接力：第一笔跨过左缺口，第二笔跨过右缺口；两段都应顺着落差向下。';
+ return add(l,[line([668,520],[882,600]),line([1098,640],[1312,710])]);
+}
+steppingRoute('ch2_l02','画出一条归途',2);
 bridge('ch2_l03','尺度之外',2,{small:true});
 {
  const l=base('ch2_l04','等长的两端',chapters[2]);l.tag='配重 / 等长滑轮';l.boards=1;l.boardSpec={w:260,h:18};l.bodies.push(ball(680,714),rect('trayA',680,760,260,22,{isStatic:false,category:'pulley',density:.005,lockRotation:true,angle:.12}),rect('trayB',400,520,260,22,{isStatic:false,category:'pulley',density:.005,lockRotation:true}),cube('weight',1500,790,60,.04),rect('rack',1500,830,160,20),rect('shaft',825,770,20,340),ramp('end',1090,605,1730,820));
  l.mechanisms=[{type:'pulley',bodyId:'trayA',otherBodyId:'trayB',ropeY:1280,minY:520,maxY:760,anchor:{x:890,y:300},trayAngle:.12}];l.draggable=['weight'];l.placementZones.weight=[{x:1500,y:790,w:150,h:65},{x:400,y:479,w:150,h:65}];l.buildAreas=[{x:965,y:585,w:290,h:150}];l.intro='把配重放到空托盘，载球托盘就会带球上升。用木板接到高台。';l.hint='两端等距反向运动；没有空盘配重，球和左盘会停在低处。木板连接挡墙顶端与右侧出口。';add(l,[place('weight',400,479),board(950,580,.22)]);
 }
 {
- const l=base('ch2_l05','静止的秩序',chapters[2]);l.tag='堆叠 / 释放 / 稳定';l.boards=0;l.lines=1;l.bodies.push(ball(150,700),rect('floor',960,850,1800,30),cube('cube1',300,805),cube('cube2',480,805),cube('cube3',660,805));l.goal={type:'stable',stableBodies:['cube1','cube2','cube3'],stableForMs:3000,zone:{x:1450,y:665,w:160,h:340},starTimesMs:[120000,180000]};l.draggable=['cube1','cube2','cube3'];for(const [i,id] of l.draggable.entries())l.placementZones[id]=[{x:300+i*180,y:805,w:100,h:65},{x:1450,y:665,w:160,h:340}];l.buildAreas=[{x:1450,y:650,w:210,h:350}];l.shard={x:1450,y:790};l.intro='把三个方块移到右侧框内叠起来，点击释放，观察是否能稳住 3 秒。';l.hint='方块贴近台面或另一方块会吸附；先摆底层，再摆上层。准备阶段不计稳定时间。';add(l,[place('cube1',1450,805),place('cube2',1450,745),place('cube3',1450,685)]);
-}
-gate('ch3_l01','光门的时限',3,true);
-{
- const l=base('ch3_l02','逆流而上',chapters[3]);l.tag='升流井 / 入口 / 出口';l.lines=1;l.boardSpec={w:290,h:18};l.bodies.push(ball(300,350),ramp('start',230,450,800,690),rect('wellWall',1220,705,20,330),ramp('roof',950,430,1220,320),ramp('end',1520,500,1730,780));l.sensors=[{id:'field',type:'gravityField',x:1070,y:550,w:280,h:400,force:{x:0,y:-1.5}}];l.buildAreas=[{x:880,y:710,w:210,h:150},{x:1360,y:450,w:330,h:170}];l.intro='画入口导坡，把球送进紫色升流井；再用木板连接井口和高台。';l.hint='升流井只能抬升井内的球，离开后重力仍向下。两端都要有承接，右壁会引导球从上方离开。';l.collector={x:1670,y:680,r:64};add(l,[line([818,690],[960,710]),board(1360,450,.2)]);
+ const l=base('ch2_l05','静止的秩序',chapters[2]);l.tag='堆叠 / 释放 / 稳定';l.boards=0;l.lines=0;l.bodies.push(rect('floor',960,850,1800,30),cube('cube1',300,805),cube('cube2',480,805),cube('cube3',660,805));l.goal={type:'stable',stableBodies:['cube1','cube2','cube3'],stableForMs:3000,zone:{x:1450,y:665,w:160,h:340},starTimesMs:[120000,180000]};l.draggable=['cube1','cube2','cube3'];for(const [i,id] of l.draggable.entries())l.placementZones[id]=[{x:300+i*180,y:805,w:100,h:65},{x:1450,y:665,w:160,h:340}];l.buildAreas=[];l.shard={x:1450,y:790};l.intro='把三个方块移到右侧框内叠起来，点击释放，观察是否能稳住 3 秒。';l.hint='方块贴近台面或另一方块会吸附；先摆底层，再摆上层。准备阶段不计稳定时间。';add(l,[place('cube1',1450,805),place('cube2',1450,745),place('cube3',1450,685)]);
 }
 {
- const l=bridge('ch3_l03','水流的方向',3);l.tag='水流 / 分岔 / 导板';l.sensors=[{id:'water',type:'water',x:650,y:520,w:480,h:260,force:{x:.25,y:0}}];l.intro='水流提供水平动力，木板决定从哪里离开。先把缺口接到目标出口。';
+ const l=base('ch3_l01','光门的时限',chapters[3]);l.boardSpec={w:370,h:18};
+ l.bodies.push(ball(300,350),ramp('start',230,450,700,600),ramp('end',1080,730,1730,820));
+ l.buildAreas=[{x:890,y:665,w:410,h:240}];echoGate(l,650,550,180);l.links[0].semantic='pulse';l.links[0].durationMs=4000;
+ l.tag='光门 / 四秒窗口';l.intro='光束只让门打开4秒。准备好连续下坡桥，让小球在门关闭前穿过。';l.hint='复习第一章光门，但这次不会永久开启。坡度太缓或形成凹槽会耽误时间；返回准备后，门与计时都会复位。';
+ add(l,[board(890,665,Math.atan2(130,380))]);
 }
-for(const [id,name,final] of [['ch3_l04','三色回廊',false],['ch3_l05','回廊的回声',true]]){
- const l=bridge(id,name,3,{draw:true});l.tag=final?'顺序链 / 水流 / 染色门':'染色 / 洗色 / 选路';l.sensors=[{id:final?'A':'red',type:'laser',x:460,y:550,w:18,h:320,dye:'red'},{id:final?'B':'yellow',type:'laser',x:770,y:570,w:18,h:260,dye:'yellow'},{id:'wash',type:'wash',x:1000,y:850,w:140,h:100},{id:final?'C':'blue',type:'laser',x:1300,y:710,w:18,h:200,dye:'blue'}];l.collector.acceptColor='blue';l.goal.colorChain=['red','yellow','blue'];l.intro='沿红 → 黄 → 蓝布置路线。掉进下方洗色口后可返回准备调整。';l.hint='画线把左侧出口接到右侧入口，保持高度避开下方洗色口。颜色和顺序由球经过的路线决定。';
- if(final){l.bodies.push(rect('gate',1470,640,24,360,{category:'door'}));l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1470,y:460},requireSequence:true,openAngle:-Math.PI/2}];l.goal.sequence=['A','B','C'];l.links=[{source:'C',target:'gate',semantic:'once'}];l.sensors.push({id:'flow',type:'water',x:1250,y:700,w:250,h:160,force:{x:.15,y:0}});}
+{
+ const l=base('ch3_l02','乘流而上',chapters[3]);l.tag='升流井 / 入口 / 出口';l.lines=1;l.boardSpec={w:290,h:18};l.bodies.push(ball(300,350),ramp('start',230,450,800,690),rect('wellWall',1220,705,20,330),ramp('roof',950,430,1220,320),ramp('end',1520,500,1730,780));l.sensors=[{id:'field',type:'gravityField',x:1070,y:550,w:280,h:400,force:{x:0,y:-1.5}}];l.buildAreas=[{x:880,y:710,w:210,h:150},{x:1360,y:450,w:330,h:170}];l.intro='画入口导坡，把球送进紫色升流井；再用木板连接井口和高台。';l.hint='升流井只能抬升井内的球，离开后重力仍向下。两端都要有承接，右壁会引导球从上方离开。';l.collector={x:1670,y:680,r:64};add(l,[line([818,690],[960,710]),board(1360,450,.2)]);
 }
+{
+ waterRoute('ch3_l03','水流的方向');
+}
+function waterRoute(id,name){
+ const l=base(id,name,chapters[3]);l.bodies.push(ball(300,620),rect('start',515,700,570,20),ramp('end',1120,700,1730,820));l.buildAreas=[{x:960,y:700,w:360,h:170}];
+ l.sensors=[{id:'water',type:'water',x:520,y:620,w:600,h:220,force:{x:.25,y:0}}];l.tag='水平水流 / 出口桥';l.intro='小球落在水平河床上，只有水流能推它出发。搭好出口桥，把水的推力接到终点。';l.hint='这里没有起步斜坡。箭头表示水流方向；水平放板衔接两岸，离开水流后由已有速度和下坡继续前进。';return add(l,[board(960,700,0)]);
+}
+{
+ const l=steppingRoute('ch3_l04','三色回廊',3);l.tag='三色顺序 / 洗色归白';
+ l.sensors=[{id:'red',type:'laser',x:480,y:450,w:18,h:160,dye:'red'},{id:'yellow',type:'laser',x:1000,y:590,w:18,h:140,dye:'yellow'},{id:'blue',type:'laser',x:1390,y:690,w:18,h:140,dye:'blue'},{id:'wash',type:'wash',x:1530,y:735,w:70,h:120}];l.goal.colorChain=['red','yellow','blue'];l.collector.acceptColor='white';
+ l.intro='让小球依次记下红、黄、蓝三种光，再经过洗色区恢复白色，回到白色收集器。';l.hint='两段导流线把三处颜色站连起来。顶部记录颜色经过顺序；洗色只清除球当前颜色，不抹掉走过的顺序。缺少颜色或没洗回白色都不能入仓。';
+}
+{
+ const l=waterRoute('ch3_l05','回廊的回声');l.tag='综合 / 水流 / 三色 / 限时光门';
+ l.boards=2;l.boardSpec={w:290,h:18};l.bodies=l.bodies.filter(b=>!['start','end'].includes(b.id));l.bodies.push(rect('start',440,700,420,20),ramp('end',1250,745,1730,820));l.buildAreas=[{x:950,y:700,w:650,h:170}];l.sensors[0]={id:'water',type:'water',x:440,y:620,w:440,h:220,force:{x:.25,y:0}};
+ l.sensors.push({id:'red',type:'laser',x:460,y:650,w:18,h:140,dye:'red'},{id:'yellow',type:'laser',x:900,y:650,w:18,h:140,dye:'yellow'},{id:'blue',type:'laser',x:1290,y:680,w:18,h:160,dye:'blue'},{id:'wash',type:'wash',x:1560,y:740,w:70,h:140});
+ l.bodies.push(rect('gate',1450,540,24,600,{category:'door'}));l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1450,y:240},requireSequence:true,openAngle:-Math.PI/2}];l.links=[{source:'blue',target:'gate',semantic:'pulse',durationMs:4000}];l.goal.colorChain=['red','yellow','blue'];l.collector.acceptColor='white';
+ l.intro='让回廊回应完整的三色旅程：水流推动小球，两块桥板接力，集齐三色后光门回应4秒，再洗回白色入仓。';l.hint='综合第二章双板桥和本章水流、四秒光门、三色洗色。两块板接成向终点缓降的长桥跨过宽缺口；缺水流不能出发，缺桥会跌落，缺任一颜色门不回应。';
+ solutions[l.id]=[board(800,710,.07),board(1100,731,.07)];const end=l.bodies.find(b=>b.id==='end');l.shard={x:1620,y:end.y+(1620-end.x)*Math.tan(end.angle)-(24+end.h/2)/Math.cos(end.angle)};
+}
+const teaching={
+ ch2_l01:['缺口超过一块板的长度：把两块木板接成连续缓坡。','检查两块板的接缝和两岸落差，避免中间出现台阶。','观察：第一块承接起点，第二块把路线延长到终点。'],
+ ch2_l02:['画第一段到中间平台，再画第二段到终点道路。','检查左右两个缺口都接好；中途平台是落脚点。','观察：导流线 → 中途平台 → 第二段导流线，分段完成归途。'],
+ ch2_l03:['先缩小球，让它能穿过窄缝；再画线接住后面的缺口。','检查球的大小与导流线；缩放只在准备时生效。','观察：小球通过低矮通道，沿线继续前行。'],
+ ch2_l04:['把配重放到空托盘，再搭板连接载球盘的高处出口。','检查托盘配重和出口桥；两端会等距离反向移动。','观察：空盘下沉 → 球盘上升 → 高处出口承接。'],
+ ch2_l05:['先摆底层，再把另外两块叠上去；三个方块都要在目标框内。','检查每层都有支撑，再释放；准备阶段不算稳定时间。','观察：全部方块在框内静止3秒，才算建立秩序。'],
+ ch3_l01:['搭一段连续下坡桥；球触发光束后，门只打开4秒。','检查桥面不要形成凹槽；过慢的路线会错过开门窗口。','看门旁倒计时。门关闭后可返回准备，调整坡度重试。'],
+ ch3_l02:['画入口导坡送球入井，再用木板承接上方出口。','检查井的入口和出口；升流只在标出的范围内有效。','观察：乘升流上升，离井后重新下落，由出口板承接。'],
+ ch3_l03:['水流推动水平河床上的球。用水平木板连接出口缺口。','检查两岸与桥面的高度；箭头就是水的推动方向。','观察：水流提供起步动力，桥面承接，出水后继续滑行。'],
+ ch3_l04:['画两段路线经过红、黄、蓝三站，最后洗回白色。','检查两段承接；顶部记录颜色顺序，白色收集器要求洗色。','观察：三色记录保留，洗色只清除当前颜色。'],
+ ch3_l05:['用两块板搭长缓坡桥，连接水流出口与三色光门。','检查两块板的接缝：水流 → 三色 → 四秒开门 → 洗白入仓。','观察完整联动；门只回应三色齐备的旅程，最后还要洗色。']
+};
+for(const l of levels)if(teaching[l.id])l.tutorial=teaching[l.id].map((text,i)=>['① ','② ','③ '][i]+text);
 const root=path.resolve(__dirname,'..');fs.mkdirSync(path.join(root,'tests/fixtures'),{recursive:true});fs.writeFileSync(path.join(root,'static/game/data/levels.json'),JSON.stringify(levels,null,2)+'\n');fs.writeFileSync(path.join(root,'tests/fixtures/solutions.json'),JSON.stringify(solutions,null,2)+'\n');console.log('Authored '+levels.length+' fixed-gravity layouts and preparation replays.');

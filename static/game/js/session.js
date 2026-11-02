@@ -8,7 +8,7 @@
   class PuzzleSession{
     constructor(level,emit=()=>{}){GameCore.validateLevel(level);this.level=level;this.emit=emit;this.elapsed=0;this.resets=0;this.history=[];this.serial=0;this.config={artifacts:[],placements:{},scale:1};this.rebuild();}
     get phase(){return this.state;}
-    rebuild(){this.physics?.dispose();this.physics=new PhysicsService();this.runtime=new LevelRuntime(this.level,this.physics,(type,data)=>{if(type==='win')this.state='cleared';if(type==='failed')this.state='failed';this.emit(type,data);});this.state='preparing';for(const [id,p] of Object.entries(this.config.placements))this.physics.position(id,p);this.physics.scale('ball',this.config.scale);for(const a of this.config.artifacts)for(const s of a.specs)this.physics.add(s);}
+    rebuild(){this.physics?.dispose();this.physics=new PhysicsService();this.runtime=new LevelRuntime(this.level,this.physics,(type,data)=>{if(type==='win')this.state='cleared';if(type==='failed')this.state='failed';this.emit(type,data);});this.state='preparing';for(const [id,p] of Object.entries(this.config.placements))this.physics.position(id,p);if(this.physics.get('ball'))this.physics.scale('ball',this.config.scale);for(const a of this.config.artifacts)for(const s of a.specs)this.physics.add(s);}
     used(type){return this.config.artifacts.filter(a=>a.type===type).length;}
     remember(){this.history.push(clone(this.config));}
     lessonProgress(){const l=this.level.lesson;if(!l)return null;const at=this.config.placements[l.sourceId],ready=l.kind==='weight'?!!at&&Math.hypot(at.x-l.target.x,at.y-l.target.y)<2:this.used(l.kind)>0;return{ready,step:(this.state==='paused'?this.returnState:this.state)==='preparing'?ready?1:0:2};}

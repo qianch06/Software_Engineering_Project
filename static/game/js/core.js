@@ -43,7 +43,7 @@
     const rect=z=>z&&finite(z.x,z.y,z.w,z.h)&&z.w>0&&z.h>0;
     if(!Array.isArray(l.buildAreas)||l.buildAreas.some(z=>!rect(z))||(l.boards||l.lines)&&!l.buildAreas.length)fail('E_LEVEL_BUILD_AREA');
     const ids=new Set();for(const b of l.bodies){if(!b.id||ids.has(b.id)||!['rect','circle'].includes(b.type)||!finite(b.x,b.y,b.angle??0)||(b.type==='rect'?!finite(b.w,b.h)||b.w<=0||b.h<=0:!finite(b.r)||b.r<=0))fail('E_LEVEL_BODY');if(Math.abs(b.x)>4000||Math.abs(b.y)>4000||b.restitution!=null&&(!finite(b.restitution)||b.restitution<0||b.restitution>1))fail('E_LEVEL_RANGE');ids.add(b.id);}
-    if(!ids.has('ball'))fail('E_LEVEL_BALL');if(!finite(l.collector.x,l.collector.y,l.collector.r)||l.collector.r<=0)fail('E_LEVEL_COLLECTOR');
+    if(!ids.has('ball')&&(l.goal?.type!=='stable'||l.resizable||l.sensors.length||l.mechanisms.length))fail('E_LEVEL_BALL');if(!finite(l.collector.x,l.collector.y,l.collector.r)||l.collector.r<=0)fail('E_LEVEL_COLLECTOR');
     if(l.collector.acceptColor&&!['white','red','yellow','blue'].includes(l.collector.acceptColor))fail('E_LEVEL_COLOR');
     for(const id of l.draggable||[])if(!ids.has(id)||l.bodies.find(b=>b.id===id).category!=='taskCube'||!l.placementZones?.[id]?.length||l.placementZones[id].some(z=>!rect(z)))fail('E_LEVEL_DRAG');
     for(const m of l.mechanisms||[]){if(m.type==='lever'&&(!m.anchor||!finite(m.anchor.x,m.anchor.y,m.limit)||m.limit<=0||m.limit>Math.PI/2))fail('E_LEVEL_MECHANISM');if(m.type==='door'&&(!m.anchor||!finite(m.anchor.x,m.anchor.y)||m.openAngle!=null&&!finite(m.openAngle)))fail('E_LEVEL_MECHANISM');if(m.type==='spring'&&(!finite(m.gain)||m.gain<=0||m.gain>24))fail('E_LEVEL_MECHANISM');}
@@ -54,7 +54,7 @@
     const sources=new Set(),mechanisms=new Set();for(const m of l.mechanisms||[]){if(!['lever','door','spring','pulley'].includes(m.type)||!ids.has(m.bodyId))fail('E_LEVEL_REF');if(m.type==='pulley'&&(!ids.has(m.otherBodyId)||!finite(m.ropeY,m.minY,m.maxY)||m.minY>=m.maxY))fail('E_LEVEL_PULLEY');mechanisms.add(m.bodyId);sources.add(m.bodyId);}
     if(l.mechanisms?.some(m=>m.type==='spring')&&l.resizable&&(l.scaleRange[0]<.7||l.scaleRange[1]>1.3))fail('E_LEVEL_SCALE');
     for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
-    if(l.sensors?.some(s=>s.dye)&&!l.sensors.some(s=>s.type==='wash'))fail('E_LEVEL_WASH');
+
     const fields=(l.sensors||[]).filter(z=>z.type==='gravityField');
     if(fields.length>1||fields.some(z=>(l.baseId||l.id)!=='ch3_l02'||!z.force||z.force.x!==0||z.force.y>=0||z.force.y< -2))fail('E_LEVEL_FIELD');
     for(const link of l.links||[])if(!sources.has(link.source)||!mechanisms.has(link.target)||!['once','hold','toggle','pulse'].includes(link.semantic)||link.semantic==='pulse'&&!(link.durationMs>0))fail('E_LEVEL_LINK');

@@ -45,7 +45,7 @@
       for(const z of l.sensors){
         const touching=z.type==='pressure'?p.all().some(b=>!b.isStatic&&inside(b,z,b.r||Math.min(b.w,b.h)/2)):inside(ball,z,ball.r);
         if(touching!==!!this.zones[z.id]){
-          if(touching){if(z.dye){this.color=z.dye;if(this.colors.expected.includes(z.dye)&&!this.colors.hit(z.dye))this.emit('wrong',{text:'颜色顺序不符，先回洗色区再试。'});}if(z.type==='wash')this.color='white';this.emit('sensor',{x:ball.x,y:ball.y,color:this.color});}
+          if(touching){if(z.dye){this.color=z.dye;if(this.colors.expected.includes(z.dye)&&!this.colors.hit(z.dye))this.emit('wrong',{text:'颜色顺序不符，请返回准备调整路线。'});}if(z.type==='wash')this.color='white';this.emit('sensor',{x:ball.x,y:ball.y,color:this.color});}
           this.source(z.id,touching,z.x,z.y);this.zones[z.id]=touching;
         }
       }
