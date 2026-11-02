@@ -18,7 +18,7 @@
       Matter.Events.on(this.engine,'collisionEnd',event=>{for(const pair of event.pairs){const a=this.items.get(pair.bodyA.label),b=this.items.get(pair.bodyB.label);if(!a||!b)continue;const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;this.ballContacts.delete((ball===a?b:a).spec.id);}});
     }
     add(s) {
-      const opts = {isStatic:!!s.isStatic, angle:s.angle||0, friction:s.friction??0.12, frictionAir:s.frictionAir??0.012, restitution:s.restitution??0.12, density:s.density||0.002, isSensor:!!s.isSensor, label:s.id};
+      const opts = {isStatic:!!s.isStatic, angle:s.angle||0, friction:s.friction??0.12, frictionAir:s.frictionAir??0.012, restitution:s.restitution??0.12, density:s.density||0.002, isSensor:!!s.isSensor, sleepThreshold:s.sleepThreshold??60, label:s.id};
       const b = s.type==='circle' ? Matter.Bodies.circle(s.x,s.y,s.r,opts) : Matter.Bodies.rectangle(s.x,s.y,s.w,s.h,opts);
       if(s.lockRotation)Matter.Body.setInertia(b,Infinity);
       this.items.set(s.id,{body:b,spec:{...s},scale:1}); Matter.Composite.add(this.engine.world,b); return s.id;

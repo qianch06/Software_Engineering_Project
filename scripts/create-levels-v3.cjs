@@ -106,4 +106,6 @@ for(const l of levels)if(l.id.startsWith('ch2')&&teaching[l.id])l.tutorial=teach
 
 for(const l of levels)if(l.id.startsWith('ch'))l.goal.starTimesMs=[300000,480000];
 
+require('./author-chapter-four.cjs')({levels,solutions,rect,ramp,ball,cube,board,line,place});
+
 const root=path.resolve(__dirname,'..');fs.mkdirSync(path.join(root,'tests/fixtures'),{recursive:true});fs.writeFileSync(path.join(root,'static/game/data/levels.json'),JSON.stringify(levels,null,2)+'\n');fs.writeFileSync(path.join(root,'tests/fixtures/solutions.json'),JSON.stringify(solutions,null,2)+'\n');console.log('Authored '+levels.length+' fixed-gravity layouts and preparation replays.');

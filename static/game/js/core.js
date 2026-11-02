@@ -2,7 +2,7 @@
   'use strict';
   const KEY='gravity-shift-v2',LEGACY='gravity-shift-v1';
   const GRAVITY=Object.freeze({x:0,y:1});
-  const defaults=()=>({version:2,rulesVersion:3,settings:{touchSensitivity:1,sound:true,music:true,vibrate:true,adminMode:false},completed:{},legacyCompleted:{},tutorials:{},shards:{},lastLevelId:null});
+  const defaults=()=>({version:2,rulesVersion:3,settings:{touchSensitivity:1,sound:true,music:true,vibrate:true,adminMode:false},courtyard:{},completed:{},legacyCompleted:{},tutorials:{},shards:{},lastLevelId:null});
   const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
   class StorageService {
     constructor(adapter){this.adapter=adapter;this.warning='';this.data=defaults();try{const raw=adapter.getItem(KEY)||adapter.getItem(LEGACY);if(raw)this.data=StorageService.decode(JSON.parse(raw));}catch(_){this.warning='存档损坏或不可读取，已启用新进度；原始数据未覆盖。';this.corrupt=true;try{const backup=adapter.getItem(KEY+'-backup');if(backup){this.data=StorageService.decode(JSON.parse(backup));this.warning='主存档损坏，已恢复上一次备份。';}}catch(_){}}}
@@ -11,10 +11,11 @@
       const result=defaults(),s=object(d.settings)?d.settings:{};
       for(const k of ['sound','music','vibrate','adminMode'])if(typeof s[k]==='boolean')result.settings[k]=s[k];
       if([.7,1,1.3].includes(s.touchSensitivity))result.settings.touchSensitivity=s.touchSensitivity;
+      if(object(d.courtyard))for(const[id,value]of Object.entries(d.courtyard))if(/^ch4_g0[1-5]$/.test(id)&&object(value)&&object(value.state)&&Array.isArray(value.history))result.courtyard[id]=value;
       const records=raw=>{const out={};for(const [id,r] of Object.entries(object(raw)?raw:{}))if(/^[a-z0-9_]+$/.test(id)&&object(r)&&[1,2,3].includes(r.stars)&&Number.isFinite(r.bestTimeMs)&&r.bestTimeMs>=0)out[id]={stars:r.stars,bestTimeMs:r.bestTimeMs,resets:Number.isInteger(r.resets)&&r.resets>=0?r.resets:0};return out;};
       if(d.rulesVersion===3){result.completed=records(d.completed);result.legacyCompleted=records(d.legacyCompleted);if(object(d.tutorials))for(const [id,v] of Object.entries(d.tutorials))if(/^tut_\w+$/.test(id)&&v===true)result.tutorials[id]=true;}
       else result.legacyCompleted=records(d.completed);
-      for(const [id,v] of Object.entries(d.shards))if(/^ch[123]_l0[1-6]$/.test(id)&&v===true)result.shards[id]=true;
+      for(const [id,v] of Object.entries(d.shards))if(/^ch[1234]_l0[1-6]$/.test(id)&&v===true)result.shards[id]=true;
       result.lastLevelId=typeof d.lastLevelId==='string'&&/^[a-z0-9_]+$/.test(d.lastLevelId)?d.lastLevelId:null;return result;
     }
     save(){try{const wasCorrupt=this.corrupt;if(this.corrupt){const old=this.adapter.getItem(KEY);if(old)this.adapter.setItem(KEY+'-corrupt-backup',old);this.corrupt=false;}const old=this.adapter.getItem(KEY);if(old&&!wasCorrupt)this.adapter.setItem(KEY+'-backup',old);this.adapter.setItem(KEY,JSON.stringify(this.data));this.warning='';return true;}catch(_){this.warning='保存失败，进度暂存于内存，请检查可用空间。';return false;}}

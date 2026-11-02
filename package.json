@@ -5,7 +5,7 @@
   "description": "微光归途：离线物理解谜 · HBuilderX uni-app Vue3",
   "scripts": {
     "levels": "node scripts/build-levels.cjs",
-    "test": "node --test tests/core.test.cjs tests/runtime.test.cjs tests/playability.test.cjs tests/tutorial.test.cjs",
+    "test": "node --test tests/core.test.cjs tests/runtime.test.cjs tests/playability.test.cjs tests/tutorial.test.cjs tests/chapter-four.test.cjs",
     "build:h5": "node scripts/build.cjs h5",
     "build:app": "node scripts/build.cjs app",
     "preflight": "node scripts/preflight.cjs",

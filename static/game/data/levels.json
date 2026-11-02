@@ -2810,5 +2810,1645 @@
         "text": "高处出口"
       }
     ]
+  },
+  {
+    "scene": {
+      "width": 1920,
+      "height": 1000,
+      "title": "双层回廊"
+    },
+    "id": "ch4_g01",
+    "name": "抵达之前",
+    "chapter": "第四章 · 回环之庭",
+    "mode": "courtyard",
+    "tag": "双相 / 钥纹",
+    "intro": "必须先去看似远离终点的位置，留下跨相位保存的开门记录。",
+    "hint": "X 换红，经 A、K 到 Y；Y 换蓝，经 Z 到 E。",
+    "tutorial": [
+      "终点需要什么标记？这个标记在哪个相位能拿到？",
+      "钥纹会跨相位保留，通路不会。把拿钥匙和去终点拆成两段。",
+      "X 换红，经 A、K 到 Y；Y 换蓝，经 Z 到 E。"
+    ],
+    "rulesVersion": 3,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "boards": 0,
+    "lines": 0,
+    "buildAreas": [],
+    "placementZones": {},
+    "draggable": [],
+    "scaleRange": [
+      1,
+      1
+    ],
+    "collector": {
+      "x": 0,
+      "y": 0,
+      "r": 1
+    },
+    "bodies": [
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 300,
+        "y": 400,
+        "r": 24,
+        "category": "energyBall"
+      }
+    ],
+    "sensors": [],
+    "mechanisms": [],
+    "links": [],
+    "goal": {
+      "type": "transport"
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "S",
+          "x": 160,
+          "y": 690,
+          "label": "起点",
+          "name": "出发台"
+        },
+        {
+          "id": "X",
+          "x": 500,
+          "y": 690,
+          "label": "换相台",
+          "name": "换相站"
+        },
+        {
+          "id": "A",
+          "x": 500,
+          "y": 270,
+          "label": "红廊",
+          "name": "红廊升降台"
+        },
+        {
+          "id": "K",
+          "x": 1100,
+          "y": 270,
+          "label": "记忆钥",
+          "name": "钥纹台"
+        },
+        {
+          "id": "Y",
+          "x": 1450,
+          "y": 690,
+          "label": "换相台",
+          "name": "远端换相站"
+        },
+        {
+          "id": "Z",
+          "x": 1020,
+          "y": 850,
+          "label": "蓝廊",
+          "name": "回程接驳台"
+        },
+        {
+          "id": "E",
+          "x": 1730,
+          "y": 850,
+          "label": "终点",
+          "name": "收集器"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e0",
+          "a": "S",
+          "b": "X",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 160,
+              "y": 690
+            },
+            {
+              "x": 500,
+              "y": 690
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "a": "X",
+          "b": "A",
+          "oneWay": false,
+          "label": "红相",
+          "noCargo": false,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 500,
+              "y": 690
+            },
+            {
+              "x": 500,
+              "y": 270
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "a": "A",
+          "b": "K",
+          "oneWay": false,
+          "label": "红相",
+          "noCargo": false,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 500,
+              "y": 270
+            },
+            {
+              "x": 1100,
+              "y": 270
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "a": "K",
+          "b": "Y",
+          "oneWay": false,
+          "label": "红相",
+          "noCargo": false,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1100,
+              "y": 270
+            },
+            {
+              "x": 1450,
+              "y": 270
+            },
+            {
+              "x": 1450,
+              "y": 690
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "a": "Y",
+          "b": "Z",
+          "oneWay": false,
+          "label": "蓝相",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1450,
+              "y": 690
+            },
+            {
+              "x": 1450,
+              "y": 850
+            },
+            {
+              "x": 1020,
+              "y": 850
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "a": "X",
+          "b": "Z",
+          "oneWay": false,
+          "label": "蓝相",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 500,
+              "y": 690
+            },
+            {
+              "x": 500,
+              "y": 850
+            },
+            {
+              "x": 1020,
+              "y": 850
+            }
+          ]
+        },
+        {
+          "id": "e6",
+          "a": "Z",
+          "b": "E",
+          "oneWay": false,
+          "label": "蓝相 + 钥",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": true,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1020,
+              "y": 850
+            },
+            {
+              "x": 1730,
+              "y": 850
+            }
+          ]
+        }
+      ],
+      "phase": "blue",
+      "phaseStations": [
+        "X",
+        "Y"
+      ],
+      "bridgeStations": [],
+      "keyNode": "K",
+      "weight": null,
+      "buttons": {}
+    }
+  },
+  {
+    "scene": {
+      "width": 1920,
+      "height": 1000,
+      "title": "内外双桥"
+    },
+    "id": "ch4_g02",
+    "name": "一座桥的两面",
+    "chapter": "第四章 · 回环之庭",
+    "mode": "courtyard",
+    "tag": "联动桥 / 回环",
+    "intro": "旋转一次同时改变两处连接，先进入内环拿钥匙，再改桥走外环。",
+    "hint": "红相 H—A—K—T；在 T 转到桥位 1 并换蓝，回 H—B—Q；Q 换红入 E。",
+    "tutorial": [
+      "两处桥头共用哪根传动轴？控制端在哪里？",
+      "转桥会关闭内环入口，但蓝相提供另一条回到枢纽的路。",
+      "红相 H—A—K—T；在 T 转到桥位 1 并换蓝，回 H—B—Q；Q 换红入 E。"
+    ],
+    "rulesVersion": 3,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "boards": 0,
+    "lines": 0,
+    "buildAreas": [],
+    "placementZones": {},
+    "draggable": [],
+    "scaleRange": [
+      1,
+      1
+    ],
+    "collector": {
+      "x": 0,
+      "y": 0,
+      "r": 1
+    },
+    "bodies": [
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 300,
+        "y": 400,
+        "r": 24,
+        "category": "energyBall"
+      }
+    ],
+    "sensors": [],
+    "mechanisms": [],
+    "links": [],
+    "goal": {
+      "type": "transport"
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "S",
+          "x": 150,
+          "y": 760,
+          "label": "起点",
+          "name": "出发台"
+        },
+        {
+          "id": "H",
+          "x": 480,
+          "y": 760,
+          "label": "换相枢纽",
+          "name": "中央换相站"
+        },
+        {
+          "id": "A",
+          "x": 760,
+          "y": 270,
+          "label": "内环入口",
+          "name": "内桥接驳台"
+        },
+        {
+          "id": "K",
+          "x": 1080,
+          "y": 270,
+          "label": "记忆钥",
+          "name": "钥纹台"
+        },
+        {
+          "id": "T",
+          "x": 1430,
+          "y": 500,
+          "label": "换相转桥台",
+          "name": "联动控制台"
+        },
+        {
+          "id": "B",
+          "x": 790,
+          "y": 890,
+          "label": "外环入口",
+          "name": "外桥接驳台"
+        },
+        {
+          "id": "Q",
+          "x": 1370,
+          "y": 890,
+          "label": "换相台",
+          "name": "出口换相站"
+        },
+        {
+          "id": "E",
+          "x": 1740,
+          "y": 670,
+          "label": "终点",
+          "name": "收集器"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e0",
+          "a": "S",
+          "b": "H",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 150,
+              "y": 760
+            },
+            {
+              "x": 480,
+              "y": 760
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "a": "H",
+          "b": "A",
+          "oneWay": false,
+          "label": "桥位 0",
+          "noCargo": false,
+          "phase": null,
+          "bridge": 0,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 480,
+              "y": 760
+            },
+            {
+              "x": 480,
+              "y": 270
+            },
+            {
+              "x": 760,
+              "y": 270
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "a": "H",
+          "b": "B",
+          "oneWay": false,
+          "label": "桥位 1",
+          "noCargo": false,
+          "phase": null,
+          "bridge": 1,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 480,
+              "y": 760
+            },
+            {
+              "x": 480,
+              "y": 890
+            },
+            {
+              "x": 790,
+              "y": 890
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "a": "A",
+          "b": "K",
+          "oneWay": false,
+          "label": "红相",
+          "noCargo": false,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 760,
+              "y": 270
+            },
+            {
+              "x": 1080,
+              "y": 270
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "a": "K",
+          "b": "T",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1080,
+              "y": 270
+            },
+            {
+              "x": 1430,
+              "y": 270
+            },
+            {
+              "x": 1430,
+              "y": 500
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "a": "T",
+          "b": "H",
+          "oneWay": false,
+          "label": "蓝相",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1430,
+              "y": 500
+            },
+            {
+              "x": 1430,
+              "y": 620
+            },
+            {
+              "x": 650,
+              "y": 620
+            },
+            {
+              "x": 650,
+              "y": 760
+            },
+            {
+              "x": 480,
+              "y": 760
+            }
+          ]
+        },
+        {
+          "id": "e6",
+          "a": "B",
+          "b": "Q",
+          "oneWay": false,
+          "label": "蓝相",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 790,
+              "y": 890
+            },
+            {
+              "x": 1370,
+              "y": 890
+            }
+          ]
+        },
+        {
+          "id": "e7",
+          "a": "Q",
+          "b": "E",
+          "oneWay": false,
+          "label": "红相 + 钥",
+          "noCargo": false,
+          "phase": "red",
+          "bridge": null,
+          "key": true,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1370,
+              "y": 890
+            },
+            {
+              "x": 1740,
+              "y": 890
+            },
+            {
+              "x": 1740,
+              "y": 670
+            }
+          ]
+        }
+      ],
+      "phase": "red",
+      "phaseStations": [
+        "H",
+        "T",
+        "Q"
+      ],
+      "bridgeStations": [
+        "T"
+      ],
+      "keyNode": "K",
+      "weight": null,
+      "buttons": {}
+    }
+  },
+  {
+    "scene": {
+      "width": 1920,
+      "height": 1000,
+      "title": "配重回收工坊"
+    },
+    "id": "ch4_g03",
+    "name": "借走的重量",
+    "chapter": "第四章 · 回环之庭",
+    "mode": "courtyard",
+    "tag": "配重 / 复用",
+    "intro": "同一块配重要先借给入口，再取回来交给出口。",
+    "hint": "把配重留 P，球经 A—K—B 回 P；取走配重，经 B 运到 C 放下，再入 E。",
+    "tutorial": [
+      "两个压台都需要配重，但只有一个方块。第二次使用前如何把它取回来？",
+      "K 打开的回程通道不会因入口门关闭而消失。",
+      "把配重留 P，球经 A—K—B 回 P；取走配重，经 B 运到 C 放下，再入 E。"
+    ],
+    "rulesVersion": 3,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "boards": 0,
+    "lines": 0,
+    "buildAreas": [],
+    "placementZones": {},
+    "draggable": [],
+    "scaleRange": [
+      1,
+      1
+    ],
+    "collector": {
+      "x": 0,
+      "y": 0,
+      "r": 1
+    },
+    "bodies": [
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 300,
+        "y": 400,
+        "r": 24,
+        "category": "energyBall"
+      }
+    ],
+    "sensors": [],
+    "mechanisms": [],
+    "links": [],
+    "goal": {
+      "type": "transport"
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "S",
+          "x": 150,
+          "y": 820,
+          "label": "球与配重",
+          "name": "配重装载台"
+        },
+        {
+          "id": "P",
+          "x": 500,
+          "y": 820,
+          "label": "入口压台",
+          "name": "入口压台"
+        },
+        {
+          "id": "A",
+          "x": 500,
+          "y": 340,
+          "label": "内门廊",
+          "name": "上层入口"
+        },
+        {
+          "id": "K",
+          "x": 1080,
+          "y": 340,
+          "label": "回路锁存器",
+          "name": "钥纹台"
+        },
+        {
+          "id": "B",
+          "x": 1080,
+          "y": 820,
+          "label": "回程台",
+          "name": "回收接驳台"
+        },
+        {
+          "id": "C",
+          "x": 1480,
+          "y": 820,
+          "label": "终点压台",
+          "name": "出口压台"
+        },
+        {
+          "id": "E",
+          "x": 1740,
+          "y": 340,
+          "label": "终点",
+          "name": "收集器"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e0",
+          "a": "S",
+          "b": "P",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 150,
+              "y": 820
+            },
+            {
+              "x": 500,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "a": "P",
+          "b": "A",
+          "oneWay": false,
+          "label": "配重留在 P",
+          "noCargo": true,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": "P",
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 500,
+              "y": 820
+            },
+            {
+              "x": 500,
+              "y": 340
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "a": "A",
+          "b": "K",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 500,
+              "y": 340
+            },
+            {
+              "x": 1080,
+              "y": 340
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "a": "K",
+          "b": "B",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1080,
+              "y": 340
+            },
+            {
+              "x": 1080,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "a": "B",
+          "b": "P",
+          "oneWay": false,
+          "label": "钥纹已亮",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": true,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1080,
+              "y": 820
+            },
+            {
+              "x": 500,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "a": "B",
+          "b": "C",
+          "oneWay": false,
+          "label": "钥纹已亮",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": true,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1080,
+              "y": 820
+            },
+            {
+              "x": 1480,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e6",
+          "a": "C",
+          "b": "E",
+          "oneWay": false,
+          "label": "配重留在 C",
+          "noCargo": true,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": "C",
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1480,
+              "y": 820
+            },
+            {
+              "x": 1740,
+              "y": 820
+            },
+            {
+              "x": 1740,
+              "y": 340
+            }
+          ]
+        }
+      ],
+      "phase": "red",
+      "phaseStations": [],
+      "bridgeStations": [],
+      "keyNode": "K",
+      "weight": "S",
+      "buttons": {}
+    }
+  },
+  {
+    "scene": {
+      "width": 1920,
+      "height": 1000,
+      "title": "记忆控制室"
+    },
+    "id": "ch4_g04",
+    "name": "留下的回声",
+    "chapter": "第四章 · 回环之庭",
+    "mode": "courtyard",
+    "tag": "三灯 / 记忆",
+    "intro": "按钮会改变多个门的记忆；需要推理最终组合，并利用单向回程避免被关闭的门困住。",
+    "hint": "方案一：H 按 A，进 B 按 B 并回 H，进 C 按 C 并回 H，走 E；方案二先 C 再 B 最后 A。",
+    "tutorial": [
+      "哪些按钮会改变 r？终点为什么要求另外两盏灯熄灭？",
+      "三枚按钮各按一次可得到 001，但访问按钮的通路也会随灯变化。",
+      "方案一：H 按 A，进 B 按 B 并回 H，进 C 按 C 并回 H，走 E；方案二先 C 再 B 最后 A。"
+    ],
+    "rulesVersion": 3,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "boards": 0,
+    "lines": 0,
+    "buildAreas": [],
+    "placementZones": {},
+    "draggable": [],
+    "scaleRange": [
+      1,
+      1
+    ],
+    "collector": {
+      "x": 0,
+      "y": 0,
+      "r": 1
+    },
+    "bodies": [
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 300,
+        "y": 400,
+        "r": 24,
+        "category": "energyBall"
+      }
+    ],
+    "sensors": [],
+    "mechanisms": [],
+    "links": [],
+    "goal": {
+      "type": "transport"
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "S",
+          "x": 170,
+          "y": 820,
+          "label": "起点",
+          "name": "出发台"
+        },
+        {
+          "id": "H",
+          "x": 790,
+          "y": 820,
+          "label": "枢纽与 A 键",
+          "name": "A 键控制台"
+        },
+        {
+          "id": "B",
+          "x": 410,
+          "y": 250,
+          "label": "B 键",
+          "name": "B 键控制台"
+        },
+        {
+          "id": "C",
+          "x": 1320,
+          "y": 250,
+          "label": "C 键",
+          "name": "C 键控制台"
+        },
+        {
+          "id": "E",
+          "x": 1720,
+          "y": 820,
+          "label": "终点",
+          "name": "收集器"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e0",
+          "a": "S",
+          "b": "H",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 170,
+              "y": 820
+            },
+            {
+              "x": 790,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "a": "H",
+          "b": "B",
+          "oneWay": true,
+          "label": "p = 1",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": 1,
+          "q": null,
+          "path": [
+            {
+              "x": 790,
+              "y": 820
+            },
+            {
+              "x": 790,
+              "y": 450
+            },
+            {
+              "x": 410,
+              "y": 450
+            },
+            {
+              "x": 410,
+              "y": 250
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "a": "B",
+          "b": "H",
+          "oneWay": true,
+          "label": "回程升流槽",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 410,
+              "y": 250
+            },
+            {
+              "x": 240,
+              "y": 250
+            },
+            {
+              "x": 240,
+              "y": 650
+            },
+            {
+              "x": 790,
+              "y": 650
+            },
+            {
+              "x": 790,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "a": "H",
+          "b": "C",
+          "oneWay": true,
+          "label": "q = 0",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": 0,
+          "path": [
+            {
+              "x": 790,
+              "y": 820
+            },
+            {
+              "x": 970,
+              "y": 820
+            },
+            {
+              "x": 970,
+              "y": 250
+            },
+            {
+              "x": 1320,
+              "y": 250
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "a": "C",
+          "b": "H",
+          "oneWay": true,
+          "label": "回程升流槽",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1320,
+              "y": 250
+            },
+            {
+              "x": 1500,
+              "y": 250
+            },
+            {
+              "x": 1500,
+              "y": 670
+            },
+            {
+              "x": 790,
+              "y": 670
+            },
+            {
+              "x": 790,
+              "y": 820
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "a": "H",
+          "b": "E",
+          "oneWay": false,
+          "label": "p q r = 0 0 1",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": "001",
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 790,
+              "y": 820
+            },
+            {
+              "x": 1720,
+              "y": 820
+            }
+          ]
+        }
+      ],
+      "phase": "red",
+      "phaseStations": [],
+      "bridgeStations": [],
+      "keyNode": null,
+      "weight": null,
+      "buttons": {
+        "H": {
+          "name": "A",
+          "mask": 6
+        },
+        "B": {
+          "name": "B",
+          "mask": 3
+        },
+        "C": {
+          "name": "C",
+          "mask": 4
+        }
+      }
+    }
+  },
+  {
+    "scene": {
+      "width": 1920,
+      "height": 1000,
+      "title": "归途总装间"
+    },
+    "id": "ch4_g05",
+    "name": "把归途留给自己",
+    "chapter": "第四章 · 回环之庭",
+    "mode": "courtyard",
+    "tag": "双相 / 桥 / 配重",
+    "intro": "先把配重寄存在枢纽，再空身取钥与改桥，回收配重送到出口，最后恢复桥位完成终局。",
+    "hint": "S 取配重到 H 放下；H 换红经 R—K—T；T 改桥1并换蓝回 H；运配重经 B 到 P 放下；进 Q，改桥0并换红，进入 E。",
+    "tutorial": [
+      "配重、钥纹和最终桥位能否在同一阶段一次满足？哪件东西可以先留在安全处？",
+      "先空身完成内环，把蓝运货桥接上；将配重送到 P 后，再恢复终点需要的桥位。",
+      "S 取配重到 H 放下；H 换红经 R—K—T；T 改桥1并换蓝回 H；运配重经 B 到 P 放下；进 Q，改桥0并换红，进入 E。"
+    ],
+    "rulesVersion": 3,
+    "initialGravity": {
+      "x": 0,
+      "y": 1
+    },
+    "boards": 0,
+    "lines": 0,
+    "buildAreas": [],
+    "placementZones": {},
+    "draggable": [],
+    "scaleRange": [
+      1,
+      1
+    ],
+    "collector": {
+      "x": 0,
+      "y": 0,
+      "r": 1
+    },
+    "bodies": [
+      {
+        "id": "ball",
+        "type": "circle",
+        "x": 300,
+        "y": 400,
+        "r": 24,
+        "category": "energyBall"
+      }
+    ],
+    "sensors": [],
+    "mechanisms": [],
+    "links": [],
+    "goal": {
+      "type": "transport"
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "S",
+          "x": 160,
+          "y": 570,
+          "label": "球与配重",
+          "name": "配重装载台"
+        },
+        {
+          "id": "H",
+          "x": 480,
+          "y": 570,
+          "label": "中性寄存台",
+          "name": "中转寄存台"
+        },
+        {
+          "id": "R",
+          "x": 780,
+          "y": 210,
+          "label": "窄红廊",
+          "name": "内桥接驳台"
+        },
+        {
+          "id": "K",
+          "x": 1080,
+          "y": 210,
+          "label": "记忆钥",
+          "name": "钥纹台"
+        },
+        {
+          "id": "T",
+          "x": 1430,
+          "y": 400,
+          "label": "换相转桥台",
+          "name": "联动控制台"
+        },
+        {
+          "id": "B",
+          "x": 780,
+          "y": 850,
+          "label": "蓝运货桥",
+          "name": "下层接驳台"
+        },
+        {
+          "id": "P",
+          "x": 1220,
+          "y": 850,
+          "label": "出口压台",
+          "name": "出口压台"
+        },
+        {
+          "id": "Q",
+          "x": 1570,
+          "y": 850,
+          "label": "换相转桥台",
+          "name": "终局控制台"
+        },
+        {
+          "id": "E",
+          "x": 1750,
+          "y": 570,
+          "label": "终点",
+          "name": "收集器"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e0",
+          "a": "S",
+          "b": "H",
+          "oneWay": false,
+          "label": "常通",
+          "noCargo": false,
+          "phase": null,
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 160,
+              "y": 570
+            },
+            {
+              "x": 480,
+              "y": 570
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "a": "H",
+          "b": "R",
+          "oneWay": false,
+          "label": "红相 / 桥0 / 禁货",
+          "noCargo": true,
+          "phase": "red",
+          "bridge": 0,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 480,
+              "y": 570
+            },
+            {
+              "x": 480,
+              "y": 210
+            },
+            {
+              "x": 780,
+              "y": 210
+            }
+          ]
+        },
+        {
+          "id": "e2",
+          "a": "R",
+          "b": "K",
+          "oneWay": false,
+          "label": "红相 / 禁货",
+          "noCargo": true,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 780,
+              "y": 210
+            },
+            {
+              "x": 1080,
+              "y": 210
+            }
+          ]
+        },
+        {
+          "id": "e3",
+          "a": "K",
+          "b": "T",
+          "oneWay": false,
+          "label": "红相 / 禁货",
+          "noCargo": true,
+          "phase": "red",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1080,
+              "y": 210
+            },
+            {
+              "x": 1430,
+              "y": 210
+            },
+            {
+              "x": 1430,
+              "y": 400
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "a": "T",
+          "b": "H",
+          "oneWay": false,
+          "label": "蓝相 / 禁货",
+          "noCargo": true,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1430,
+              "y": 400
+            },
+            {
+              "x": 1430,
+              "y": 570
+            },
+            {
+              "x": 480,
+              "y": 570
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "a": "H",
+          "b": "B",
+          "oneWay": false,
+          "label": "蓝相 / 桥1",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": 1,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 480,
+              "y": 570
+            },
+            {
+              "x": 480,
+              "y": 850
+            },
+            {
+              "x": 780,
+              "y": 850
+            }
+          ]
+        },
+        {
+          "id": "e6",
+          "a": "B",
+          "b": "P",
+          "oneWay": false,
+          "label": "蓝相",
+          "noCargo": false,
+          "phase": "blue",
+          "bridge": null,
+          "key": false,
+          "weight": null,
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 780,
+              "y": 850
+            },
+            {
+              "x": 1220,
+              "y": 850
+            }
+          ]
+        },
+        {
+          "id": "e7",
+          "a": "P",
+          "b": "Q",
+          "oneWay": false,
+          "label": "蓝相 / 钥 / 配重P",
+          "noCargo": true,
+          "phase": "blue",
+          "bridge": null,
+          "key": true,
+          "weight": "P",
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1220,
+              "y": 850
+            },
+            {
+              "x": 1570,
+              "y": 850
+            }
+          ]
+        },
+        {
+          "id": "e8",
+          "a": "Q",
+          "b": "E",
+          "oneWay": false,
+          "label": "红相 / 桥0 / 钥 / 配重P",
+          "noCargo": true,
+          "phase": "red",
+          "bridge": 0,
+          "key": true,
+          "weight": "P",
+          "lights": null,
+          "p": null,
+          "q": null,
+          "path": [
+            {
+              "x": 1570,
+              "y": 850
+            },
+            {
+              "x": 1750,
+              "y": 850
+            },
+            {
+              "x": 1750,
+              "y": 570
+            }
+          ]
+        }
+      ],
+      "phase": "blue",
+      "phaseStations": [
+        "H",
+        "T",
+        "Q"
+      ],
+      "bridgeStations": [
+        "T",
+        "Q"
+      ],
+      "keyNode": "K",
+      "weight": "S",
+      "buttons": {}
+    }
   }
 ]
