@@ -24,6 +24,9 @@
                     "xxhdpi" : "static/icons/xxhdpi.png",
                     "xxxhdpi" : "static/icons/xxxhdpi.png"
                 }
+            },
+            "ios" : {
+                "dSYMs" : false
             }
         },
         "compilerVersion" : 3,
