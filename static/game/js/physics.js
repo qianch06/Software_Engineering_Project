@@ -9,9 +9,9 @@
           const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;
           const other=ball===a?b:a;if(other.spec.isSensor)continue;
           this.ballContacts.add(other.spec.id);
-          const normal=pair.collision.normal,velocity=ball.body.velocity,otherVelocity=other.body.velocity;
+          const normal=pair.collision.normal,velocity=ball.body.velocity,otherVelocity=other.body.velocity,point=pair.collision.supports[0]||ball.body.position;
           const speed=Math.abs((velocity.x-otherVelocity.x)*normal.x+(velocity.y-otherVelocity.y)*normal.y);
-          this.onCollision?.({speed,x:ball.body.position.x,y:ball.body.position.y,other:other.spec.id});
+          this.onCollision?.({speed,x:point.x,y:point.y,other:other.spec.id,material:other.spec.category||'terrain'});
         }
       });
       Matter.Events.on(this.engine,'collisionActive',event=>{for(const pair of event.pairs){const a=this.items.get(pair.bodyA.label),b=this.items.get(pair.bodyB.label);if(!a||!b)continue;const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;const other=ball===a?b:a;if(!other.spec.isSensor)this.ballContacts.add(other.spec.id);}});
@@ -56,6 +56,7 @@
     }
     overlaps(a,b) { return !!Matter.Collision.collides(this.items.get(a).body,this.items.get(b).body); }
     hasSolidContact(id) { return this.items.get(id)?.spec.category==='energyBall'&&this.ballContacts.size>0; }
+    contactMaterial(id) { if(!this.hasSolidContact(id))return null;const contact=this.items.get(this.ballContacts.values().next().value);return contact?.spec.category||'terrain'; }
     dispose() { Matter.Events.off(this.engine); this.ballContacts.clear(); this.onCollision=null; Matter.Composite.clear(this.engine.world,false); Matter.Engine.clear(this.engine); this.items.clear(); }
   }
   root.PhysicsService=PhysicsService;
