@@ -22,7 +22,7 @@
     unlocked(index,levels){const l=levels[index],previous=levels[index-1]?.id;return !!l&&(this.data.settings.adminMode||index===0||!!this.data.completed[previous]||!!this.data.legacyCompleted[previous]||levels.slice(index).some(next=>!!this.data.completed[next.id]||!!this.data.legacyCompleted[next.id]));}
     reset(){const settings=this.data.settings;this.data=defaults();this.data.settings=settings;return this.save();}
   }
-  function rating(time,resets,thresholds=[60000,90000]){return time<=thresholds[0]&&resets===0?3:time<=thresholds[1]&&resets<=2?2:1;}
+  function rating(time,resets,thresholds=[60000,90000]){return time<=thresholds[0]?3:time<=thresholds[1]?2:1;}
   class LinkSystem {
     constructor(links=[]){this.links=links.map(l=>({...l,active:false,fired:false,until:0,sourceActive:false}));this.time=0;}
     source(id,active){for(const l of this.links.filter(l=>l.source===id)){const rising=active&&!l.sourceActive;l.sourceActive=active;if(l.semantic==='hold')l.active=active;if(rising&&l.semantic==='once'&&!l.fired){l.active=true;l.fired=true;}if(rising&&l.semantic==='toggle')l.active=!l.active;if(rising&&l.semantic==='pulse'){l.active=true;l.until=this.time+l.durationMs;}}}

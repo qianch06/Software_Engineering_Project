@@ -14,3 +14,5 @@
 
 @media(max-height:600px){.lesson-strip{display:none}}
 .screen button,.screen a,.screen #level-list,.screen .tools{pointer-events:auto}
+
+.device-choices{position:absolute;left:24px;bottom:100px;display:flex;gap:8px;max-width:60vw;flex-wrap:wrap;pointer-events:auto}.device-choices button{min-height:44px;padding:10px 16px;background:#203b36;border:1px solid #92bfa6;border-radius:12px;color:#e1efdf;font-size:14px}.device-choices button:disabled{opacity:.65}

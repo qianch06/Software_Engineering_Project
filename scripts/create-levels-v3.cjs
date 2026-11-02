@@ -61,9 +61,9 @@ levels.slice(0,3).forEach(l=>{l.goal.starTimesMs=[300000,600000];});
 // Start the formal campaign with a new mechanism instead.
 lever('ch1_l02','两端之间',1);
 {
- const l=bridge('ch1_l03','光的回声',1);echoGate(l,650,510,180);
- l.tag='搭桥 / 光束开门';l.intro='小球穿过光束，远处的门会亮起并打开——这是光的回应。先搭桥接好后半段道路。';
- l.hint='沿用第一关的搭桥方法；虚线连接光束与门。球碰到光束后门持续开启，无需抢时间，也不用配重。';
+ const l=bridge('ch1_l03','光的回声',1);echoGate(l,1000,600,90);
+ l.tag='搭桥 / 光束开门';l.intro='光束位于缺口上方。木板既要接通道路，也要让小球经过光束，远处的门才会打开。';
+ l.hint='沿用第一关的搭桥方法；虚线连接光束与门。检查光束与桥面的高度关系；球碰到光束后门持续开启。';
  l.tutorial=['① 复习搭桥：旋转木板接住缺口；新知识是光束会向远处的门传信。','② 检查桥面两端，再释放。球穿过光束，门会回应并保持开启。','③ 观察光束与门之间的亮点：光被触发 → 门打开 → 小球过桥入仓。'];
 }
 spring('ch1_l04','向上的可能',1);
@@ -74,7 +74,7 @@ spring('ch1_l04','向上的可能',1);
  l.tutorial=['① 综合练习：用序章的画线方法，在建造区接一段缓坡；紫色弹簧负责把球送上来。','② 检查导流线是否接住落点并通往光束，再释放。无需配重，也不需要新操作。','③ 看整条链：弹簧抬升 → 导流线承接 → 光束传信 → 门开启 → 入仓。'];
  solutions[l.id]=[line([990,603],[1270,677])];
 }
-bridge('ch2_l01','悬空的答案',2,{two:true});
+
 function steppingRoute(id,name,chapter){
  const l=base(id,name,chapters[chapter]);l.boards=0;l.lines=2;
  l.bodies.push(ball(300,350),ramp('start',230,450,650,520),ramp('island',900,600,1080,640),ramp('end',1330,710,1730,820));
@@ -82,15 +82,20 @@ function steppingRoute(id,name,chapter){
  l.tag='分段画线 / 中途承接';l.intro='归途分成两段：先画线接到中间落脚台，再画第二段通往终点。';l.hint='沿用序章画线操作。中间平台负责接力：第一笔跨过左缺口，第二笔跨过右缺口；两段都应顺着落差向下。';
  return add(l,[line([668,520],[882,600]),line([1098,640],[1312,710])]);
 }
-steppingRoute('ch2_l02','画出一条归途',2);
+{
+ const l=steppingRoute('ch2_l02','画出一条归途',2);
+ l.bodies.find(b=>b.id==='island').y+=30;
+ l.buildAreas[1].y+=15;
+ solutions[l.id]=[line([668,520],[882,630]),line([1098,670],[1312,710])];
+ l.intro='中间平台低于两岸的直连路线。先落到平台，再从新的高度接出第二笔。';
+ l.hint='先比较两个缺口的落差：第一段下降较多，第二段更平缓。两笔不能照搬同一角度。';
+}
 bridge('ch2_l03','尺度之外',2,{small:true});
 {
  const l=base('ch2_l04','等长的两端',chapters[2]);l.tag='配重 / 等长滑轮';l.boards=1;l.boardSpec={w:260,h:18};l.bodies.push(ball(680,714),rect('trayA',680,760,260,22,{isStatic:false,category:'pulley',density:.005,lockRotation:true,angle:.12}),rect('trayB',400,520,260,22,{isStatic:false,category:'pulley',density:.005,lockRotation:true}),cube('weight',1500,790,60,.04),rect('rack',1500,830,160,20),rect('shaft',825,770,20,340),ramp('end',1090,605,1730,820));
  l.mechanisms=[{type:'pulley',bodyId:'trayA',otherBodyId:'trayB',ropeY:1280,minY:520,maxY:760,anchor:{x:890,y:300},trayAngle:.12}];l.draggable=['weight'];l.placementZones.weight=[{x:1500,y:790,w:150,h:65},{x:400,y:479,w:150,h:65}];l.buildAreas=[{x:965,y:585,w:290,h:150}];l.intro='把配重放到空托盘，载球托盘就会带球上升。用木板接到高台。';l.hint='两端等距反向运动；没有空盘配重，球和左盘会停在低处。木板连接挡墙顶端与右侧出口。';add(l,[place('weight',400,479),board(950,580,.22)]);
 }
-{
- const l=base('ch2_l05','静止的秩序',chapters[2]);l.tag='堆叠 / 释放 / 稳定';l.boards=0;l.lines=0;l.bodies.push(rect('floor',960,850,1800,30),cube('cube1',300,805),cube('cube2',480,805),cube('cube3',660,805));l.goal={type:'stable',stableBodies:['cube1','cube2','cube3'],stableForMs:3000,zone:{x:1450,y:665,w:160,h:340},starTimesMs:[120000,180000]};l.draggable=['cube1','cube2','cube3'];for(const [i,id] of l.draggable.entries())l.placementZones[id]=[{x:300+i*180,y:805,w:100,h:65},{x:1450,y:665,w:160,h:340}];l.buildAreas=[];l.shard={x:1450,y:790};l.intro='把三个方块移到右侧框内叠起来，点击释放，观察是否能稳住 3 秒。';l.hint='方块贴近台面或另一方块会吸附；先摆底层，再摆上层。准备阶段不计稳定时间。';add(l,[place('cube1',1450,805),place('cube2',1450,745),place('cube3',1450,685)]);
-}
+
 {
  const l=base('ch3_l01','光门的时限',chapters[3]);l.boardSpec={w:370,h:18};
  l.bodies.push(ball(300,350),ramp('start',230,450,700,600),ramp('end',1080,730,1730,820));
@@ -142,11 +147,9 @@ function waterRoute(id,name){
  solutions[l.id]=[board(800,700,.04),board(1100,720,.07)];const end=l.bodies.find(b=>b.id==='end');l.shard={x:1620,y:end.y+(1620-end.x)*Math.tan(end.angle)-(24+end.h/2)/Math.cos(end.angle)};
 }
 const teaching={
- ch2_l01:['缺口超过一块板的长度：把两块木板接成连续缓坡。','检查两块板的接缝和两岸落差，避免中间出现台阶。','观察：第一块承接起点，第二块把路线延长到终点。'],
- ch2_l02:['画第一段到中间平台，再画第二段到终点道路。','检查左右两个缺口都接好；中途平台是落脚点。','观察：导流线 → 中途平台 → 第二段导流线，分段完成归途。'],
+ ch2_l02:['观察下沉的中间平台：第一段降落，第二段以较缓坡度接出。','检查左右两个缺口都接好；中途平台是落脚点。','观察：导流线 → 中途平台 → 第二段导流线，分段完成归途。'],
  ch2_l03:['先缩小球，让它能穿过窄缝；再画线接住后面的缺口。','检查球的大小与导流线；缩放只在准备时生效。','观察：小球通过低矮通道，沿线继续前行。'],
  ch2_l04:['把配重放到空托盘，再搭板连接载球盘的高处出口。','检查托盘配重和出口桥；两端会等距离反向移动。','观察：空盘下沉 → 球盘上升 → 高处出口承接。'],
- ch2_l05:['先摆底层，再把另外两块叠上去；三个方块都要在目标框内。','检查每层都有支撑，再释放；准备阶段不算稳定时间。','观察：全部方块在框内静止3秒，才算建立秩序。'],
  ch3_l01:['搭一段连续下坡桥；球触发光束后，门只打开4秒。','检查桥面不要形成凹槽；过慢的路线会错过开门窗口。','看门旁倒计时。门关闭后可返回准备，调整坡度重试。'],
  ch3_l02:['画入口导坡送球入井，再用木板承接上方出口。','检查井的入口和出口；升流只在标出的范围内有效。','观察：乘升流上升，离井后重新下落，由出口板承接。'],
  ch3_l03:['水流推动水平河床上的球。用水平木板连接出口缺口。','检查两岸与桥面的高度；箭头就是水的推动方向。','观察：水流提供起步动力，桥面承接，出水后继续滑行。'],
@@ -154,4 +157,25 @@ const teaching={
  ch3_l05:['第一块板要铺平并抬高路径，让球碰到高处黄锁。','检查第二块板的接缝、红黄蓝顺序与四秒门；低处洗色区会抹去蓝色。','观察：水流 → 高处黄锁 → 蓝锁 → 限时光门 → 蓝色入仓。']
 };
 for(const l of levels)if(teaching[l.id])l.tutorial=teaching[l.id].map((text,i)=>['① ','② ','③ '][i]+text);
+
+// Discrete preparation choices: reason about state before committing the route.
+for(const l of levels){
+ if(l.id==='ch3_l03'){
+  l.choices=[{id:'flow',label:'水流方向',options:[{label:'向左',edits:[{id:'water',force:{x:-.25,y:0}}]},{label:'向右',edits:[{id:'water',force:{x:.25,y:0}}]}]}];
+  l.hint='先把水流切到向右，再搭平桥接住河床出口。水流只在标出的范围内提供动力。';
+ }
+ if(l.id==='ch3_l04'){
+  l.choices=[{id:'palette',label:'两站色序',options:[{label:'蓝 → 红',edits:[{id:'red',dye:'blue',label:'起点染色站'},{id:'blue',dye:'red',label:'出口染色站'}]},{label:'红 → 蓝',edits:[{id:'red',dye:'red',label:'起点染色站'},{id:'blue',dye:'blue',label:'出口染色站'}]}]}];
+  l.hint='先选择红 → 蓝，让两座染色站对应下游色锁；第一段保持高度碰到红锁，第二段接到蓝锁。';
+ }
+ if(l.id==='ch3_l05'){
+  l.choices=[{id:'palette',label:'三站色序',options:[{label:'黄 → 蓝 → 红',edits:[{id:'red',dye:'yellow'},{id:'yellow',dye:'blue'},{id:'blue',dye:'red'}]},{label:'红 → 黄 → 蓝',edits:[{id:'red',dye:'red'},{id:'yellow',dye:'yellow'},{id:'blue',dye:'blue'}]},{label:'蓝 → 红 → 黄',edits:[{id:'red',dye:'blue'},{id:'yellow',dye:'red'},{id:'blue',dye:'yellow'}]}]}];
+  l.sensors.filter(z=>z.dye).forEach((z,i)=>z.label=['起点染色站','中段染色站','出口染色站'][i]);
+  l.choices[0].options.forEach(o=>o.edits.forEach((e,i)=>e.label=['起点染色站','中段染色站','出口染色站'][i]));
+  l.hint='先选择红 → 黄 → 蓝，与沿途三把锁对应。第一块桥保持高度，第二块接到蓝锁与光门；保留蓝色入仓。';
+ }
+ if(l.id.startsWith('ch'))l.goal.starTimesMs=[300000,480000];
+ if(l.choices)solutions[l.id].unshift({type:'choice',id:l.choices[0].id,index:1});
+}
+
 const root=path.resolve(__dirname,'..');fs.mkdirSync(path.join(root,'tests/fixtures'),{recursive:true});fs.writeFileSync(path.join(root,'static/game/data/levels.json'),JSON.stringify(levels,null,2)+'\n');fs.writeFileSync(path.join(root,'tests/fixtures/solutions.json'),JSON.stringify(solutions,null,2)+'\n');console.log('Authored '+levels.length+' fixed-gravity layouts and preparation replays.');

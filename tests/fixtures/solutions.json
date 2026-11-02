@@ -95,28 +95,6 @@
       ]
     }
   ],
-  "ch2_l01": [
-    {
-      "type": "board",
-      "points": [
-        {
-          "x": 800,
-          "y": 557.5
-        }
-      ],
-      "angle": 0.24497866312686414
-    },
-    {
-      "type": "board",
-      "points": [
-        {
-          "x": 1100,
-          "y": 632.5
-        }
-      ],
-      "angle": 0.24497866312686414
-    }
-  ],
   "ch2_l02": [
     {
       "type": "line",
@@ -127,7 +105,7 @@
         },
         {
           "x": 882,
-          "y": 600
+          "y": 630
         }
       ]
     },
@@ -136,7 +114,7 @@
       "points": [
         {
           "x": 1098,
-          "y": 640
+          "y": 670
         },
         {
           "x": 1312,
@@ -184,32 +162,6 @@
       "angle": 0.22
     }
   ],
-  "ch2_l05": [
-    {
-      "type": "place",
-      "id": "cube1",
-      "point": {
-        "x": 1450,
-        "y": 805
-      }
-    },
-    {
-      "type": "place",
-      "id": "cube2",
-      "point": {
-        "x": 1450,
-        "y": 745
-      }
-    },
-    {
-      "type": "place",
-      "id": "cube3",
-      "point": {
-        "x": 1450,
-        "y": 685
-      }
-    }
-  ],
   "ch3_l01": [
     {
       "type": "board",
@@ -249,6 +201,11 @@
   ],
   "ch3_l03": [
     {
+      "type": "choice",
+      "id": "flow",
+      "index": 1
+    },
+    {
       "type": "board",
       "points": [
         {
@@ -260,6 +217,11 @@
     }
   ],
   "ch3_l04": [
+    {
+      "type": "choice",
+      "id": "palette",
+      "index": 1
+    },
     {
       "type": "line",
       "points": [
@@ -288,6 +250,11 @@
     }
   ],
   "ch3_l05": [
+    {
+      "type": "choice",
+      "id": "palette",
+      "index": 1
+    },
     {
       "type": "board",
       "points": [
