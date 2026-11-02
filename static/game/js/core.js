@@ -2,14 +2,14 @@
   'use strict';
   const KEY='gravity-shift-v2',LEGACY='gravity-shift-v1';
   const GRAVITY=Object.freeze({x:0,y:1});
-  const defaults=()=>({version:2,rulesVersion:3,settings:{touchSensitivity:1,sound:true,vibrate:true,adminMode:false},completed:{},legacyCompleted:{},tutorials:{},shards:{},lastLevelId:null});
+  const defaults=()=>({version:2,rulesVersion:3,settings:{touchSensitivity:1,sound:true,music:true,vibrate:true,adminMode:false},completed:{},legacyCompleted:{},tutorials:{},shards:{},lastLevelId:null});
   const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
   class StorageService {
     constructor(adapter){this.adapter=adapter;this.warning='';this.data=defaults();try{const raw=adapter.getItem(KEY)||adapter.getItem(LEGACY);if(raw)this.data=StorageService.decode(JSON.parse(raw));}catch(_){this.warning='存档损坏或不可读取，已启用新进度；原始数据未覆盖。';this.corrupt=true;try{const backup=adapter.getItem(KEY+'-backup');if(backup){this.data=StorageService.decode(JSON.parse(backup));this.warning='主存档损坏，已恢复上一次备份。';}}catch(_){}}}
     static decode(d){
       if(!object(d)||![1,2].includes(d.version)||!object(d.completed)||!object(d.shards))throw Error('E_SAVE_VERSION');
       const result=defaults(),s=object(d.settings)?d.settings:{};
-      for(const k of ['sound','vibrate','adminMode'])if(typeof s[k]==='boolean')result.settings[k]=s[k];
+      for(const k of ['sound','music','vibrate','adminMode'])if(typeof s[k]==='boolean')result.settings[k]=s[k];
       if([.7,1,1.3].includes(s.touchSensitivity))result.settings.touchSensitivity=s.touchSensitivity;
       const records=raw=>{const out={};for(const [id,r] of Object.entries(object(raw)?raw:{}))if(/^[a-z0-9_]+$/.test(id)&&object(r)&&[1,2,3].includes(r.stars)&&Number.isFinite(r.bestTimeMs)&&r.bestTimeMs>=0)out[id]={stars:r.stars,bestTimeMs:r.bestTimeMs,resets:Number.isInteger(r.resets)&&r.resets>=0?r.resets:0};return out;};
       if(d.rulesVersion===3){result.completed=records(d.completed);result.legacyCompleted=records(d.legacyCompleted);if(object(d.tutorials))for(const [id,v] of Object.entries(d.tutorials))if(/^tut_\w+$/.test(id)&&v===true)result.tutorials[id]=true;}
