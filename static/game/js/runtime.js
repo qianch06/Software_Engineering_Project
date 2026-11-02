@@ -17,8 +17,15 @@
     release(){if(this.phase==='preparing')this.phase='playing';}
     tick(dt){
       this.physics.gravity(GameCore.GRAVITY);if(this.phase!=='playing'||this.done||this.failed)return;this.time+=dt;const p=this.physics,l=this.level,gravity=GameCore.GRAVITY;
-      // Fields supply mass-independent acceleration. Gravity fields replace global gravity.
-      for(const b of p.all().filter(b=>!b.isStatic))for(const z of l.sensors){if((z.type==='water'||z.type==='gravityField'&&b.category==='energyBall')&&inside(b,z)){
+      // Water supports immersed objects; air is a local force, never a change of gravity.
+      for(const b of p.all().filter(b=>!b.isStatic))for(const z of l.sensors){
+        if(z.type==='water'&&z.buoyancy!=null){
+          const half=b.r||b.h/2,top=z.y-z.h/2,bottom=z.y+z.h/2;
+          const immersed=Math.max(0,Math.min(b.y+half,bottom)-Math.max(b.y-half,top))/(half*2);
+          if(immersed>0&&Math.abs(b.x-z.x)<z.w/2){const f=z.force||{x:0,y:0};p.acceleration(b.id,{x:(f.x-b.vx*.012)*immersed,y:(f.y-z.buoyancy-b.vy*.08)*immersed});}
+          continue;
+        }
+        if((z.type==='water'||['gravityField','air'].includes(z.type)&&b.category==='energyBall')&&inside(b,z)){
         const edge=Math.min(z.w/2-Math.abs(b.x-z.x),z.h/2-Math.abs(b.y-z.y)),blend=Math.max(0,Math.min(1,edge/45));
         const f=z.force||{x:0,y:-1};p.acceleration(b.id,{x:(f.x-(z.type==='gravityField'?gravity.x:0))*blend,y:(f.y-(z.type==='gravityField'?gravity.y:0))*blend});
       }}

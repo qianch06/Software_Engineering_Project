@@ -14,7 +14,7 @@
       const records=raw=>{const out={};for(const [id,r] of Object.entries(object(raw)?raw:{}))if(/^[a-z0-9_]+$/.test(id)&&object(r)&&[1,2,3].includes(r.stars)&&Number.isFinite(r.bestTimeMs)&&r.bestTimeMs>=0)out[id]={stars:r.stars,bestTimeMs:r.bestTimeMs,resets:Number.isInteger(r.resets)&&r.resets>=0?r.resets:0};return out;};
       if(d.rulesVersion===3){result.completed=records(d.completed);result.legacyCompleted=records(d.legacyCompleted);if(object(d.tutorials))for(const [id,v] of Object.entries(d.tutorials))if(/^tut_\w+$/.test(id)&&v===true)result.tutorials[id]=true;}
       else result.legacyCompleted=records(d.completed);
-      for(const [id,v] of Object.entries(d.shards))if(/^ch[123]_l0[1-5]$/.test(id)&&v===true)result.shards[id]=true;
+      for(const [id,v] of Object.entries(d.shards))if(/^ch[123]_l0[1-6]$/.test(id)&&v===true)result.shards[id]=true;
       result.lastLevelId=typeof d.lastLevelId==='string'&&/^[a-z0-9_]+$/.test(d.lastLevelId)?d.lastLevelId:null;return result;
     }
     save(){try{const wasCorrupt=this.corrupt;if(this.corrupt){const old=this.adapter.getItem(KEY);if(old)this.adapter.setItem(KEY+'-corrupt-backup',old);this.corrupt=false;}const old=this.adapter.getItem(KEY);if(old&&!wasCorrupt)this.adapter.setItem(KEY+'-backup',old);this.adapter.setItem(KEY,JSON.stringify(this.data));this.warning='';return true;}catch(_){this.warning='保存失败，进度暂存于内存，请检查可用空间。';return false;}}
@@ -52,8 +52,9 @@
     if(!l.scaleRange||!finite(...l.scaleRange)||l.scaleRange[0]<.1||l.scaleRange[1]>3||l.scaleRange[0]>1||l.scaleRange[1]<1)fail('E_LEVEL_SCALE');
     const sources=new Set(),mechanisms=new Set();for(const m of l.mechanisms||[]){if(!['lever','door','spring','pulley'].includes(m.type)||!ids.has(m.bodyId))fail('E_LEVEL_REF');if(m.type==='pulley'&&(!ids.has(m.otherBodyId)||!finite(m.ropeY,m.minY,m.maxY)||m.minY>=m.maxY))fail('E_LEVEL_PULLEY');mechanisms.add(m.bodyId);sources.add(m.bodyId);}
     if(l.mechanisms?.some(m=>m.type==='spring')&&l.resizable&&(l.scaleRange[0]<.7||l.scaleRange[1]>1.3))fail('E_LEVEL_SCALE');
-    for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.requiresColor&&(!['white','red','yellow','blue'].includes(z.requiresColor)||z.dye||!['laser','pressure'].includes(z.type)))fail('E_LEVEL_COLOR_LOCK');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
+    for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','air','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.requiresColor&&(!['white','red','yellow','blue'].includes(z.requiresColor)||z.dye||!['laser','pressure'].includes(z.type)))fail('E_LEVEL_COLOR_LOCK');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
 
+    for(const z of l.sensors){if(z.buoyancy!=null&&(z.type!=='water'||!finite(z.buoyancy)||z.buoyancy<0||z.buoyancy>3))fail('E_LEVEL_BUOYANCY');if(z.type==='air'&&(!z.force||!finite(z.force.x,z.force.y)||Math.hypot(z.force.x,z.force.y)>3))fail('E_LEVEL_AIR');}
     const fields=(l.sensors||[]).filter(z=>z.type==='gravityField');
     if(fields.length>1||fields.some(z=>(l.baseId||l.id)!=='ch3_l02'||!z.force||z.force.x!==0||z.force.y>=0||z.force.y< -2))fail('E_LEVEL_FIELD');
     for(const link of l.links||[])if(!sources.has(link.source)||!mechanisms.has(link.target)||!['once','hold','toggle','pulse'].includes(link.semantic)||link.semantic==='pulse'&&!(link.durationMs>0))fail('E_LEVEL_LINK');
