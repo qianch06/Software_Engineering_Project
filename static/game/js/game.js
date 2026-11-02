@@ -5,7 +5,7 @@
   'use strict';
   const $=id=>document.getElementById(id),{StorageService,GravityController,validateLevel}=GameCore;
   const storage=new StorageService(GamePlatform.storage);
-  const renderer=new Renderer($('world')),gravity=new GravityController();
+  const renderer=new Renderer($('world')),gravity=new GravityController(),ui=new InteractionFX($('app'));
   const g={storage,physics:null,level:null,index:0,state:'menu',tool:'move',elapsed:0,resets:0,history:[],links:[],boardAngle:0,ballColor:'white',capture:0,preview:null,stroke:[],pointers:new Map(),keys:new Set(),sensorStarted:0};
   let last=0,acc=0,toastTimer,audio,serial=0;
   const clock=ms=>`${String(Math.floor(ms/60000)).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`;
@@ -13,13 +13,34 @@
   function sound(kind){if(!storage.data.settings.sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),v=audio.createGain();o.type='sine';o.frequency.setValueAtTime(kind==='win'?660:kind==='bad'?150:440,audio.currentTime);o.frequency.exponentialRampToValueAtTime(kind==='bad'?90:880,audio.currentTime+.18);v.gain.setValueAtTime(.06,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.25);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+.26);}catch(e){}if(storage.data.settings.vibrate)try{GamePlatform.vibrate(kind==='win'?40:12);}catch(e){} }
   function save(){if(!storage.save()){toast(storage.warning);setTimeout(()=>{if(!storage.save())setTimeout(()=>storage.save(),1000);},1000);}}
   function cancelGesture(){g.physics?.endDrag();g.dragCube=null;g.pointers.clear();g.preview=null;g.stroke=[];g.dragging=false;g.pinch=null;g.keys.clear();g.joyPointer=null;}
-  function showScreen(name){if(name!=='play')$('chain-progress').classList.add('hidden');for(const id of ['menu','select','play'])$(id).classList.toggle('hidden',id!==name);document.body.classList.toggle('playing',name==='play');$('modal').classList.add('hidden');cancelGesture();}
+  function showScreen(name){ui.transition(()=>{if(name!=='play')$('chain-progress').classList.add('hidden');for(const id of ['menu','select','play'])$(id).classList.toggle('hidden',id!==name);document.body.classList.toggle('playing',name==='play');$('modal').classList.add('hidden');cancelGesture();});}
   function modal(html){$('modal-content').innerHTML=html;$('modal').classList.remove('hidden');cancelGesture();}
   function closeModal(){$('modal').classList.add('hidden');}
   function btn(text,action,cls='secondary'){return `<button class="${cls}" data-action="${action}">${text}</button>`;}
   function menu(){g.state='menu';showScreen('menu');$('continue').classList.toggle('hidden',!LEVELS.some(l=>l.id===storage.data.lastLevelId));}
-  function select(){g.state='select';showScreen('select');$('level-list').innerHTML='';for(const chapter of [...new Set(LEVELS.filter(l=>!l.inverse||storage.inverseUnlocked()).map(l=>l.chapter))]){const section=document.createElement('section');section.className='level-sector'+(chapter.includes('倒映')?' inverse-sector':'');const heading=document.createElement('p');heading.className='level-group-title';heading.innerHTML=`<i></i>${chapter}<small>SECTOR LINK</small>`;section.appendChild(heading);const grid=document.createElement('div');grid.className='level-grid';LEVELS.forEach((l,i)=>{if(l.chapter!==chapter)return;const open=storage.unlocked(i,LEVELS),record=storage.data.completed[l.id];const b=document.createElement('button');b.className='level-card'+(open?'':' locked')+(record?' completed':'');b.innerHTML=`<span class="node-marker"><i></i></span><span class="number">NODE ${String(i+1).padStart(2,'0')} ${open?'↗':'⌑'}</span><span class="stars">${record?'★'.repeat(record.stars)+'☆'.repeat(3-record.stars):'· · ·'}</span><strong>${l.name}</strong><span class="tag">${l.tag}</span><span class="node-state">${record?'SYNCHRONIZED':open?'AVAILABLE':'LOCKED'}</span>`;b.onclick=()=>open?start(i):toast('请先完成前置实验节点。');grid.appendChild(b);});section.appendChild(grid);$('level-list').appendChild(section);}
+  function select(){
+    g.state='select';showScreen('select');$('level-list').innerHTML='';
+    const chapters=[...new Set(LEVELS.filter(l=>!l.inverse||storage.inverseUnlocked()).map(l=>l.chapter))];
+    const activeChapter=chapters.find(chapter=>LEVELS.some((l,i)=>l.chapter===chapter&&storage.unlocked(i,LEVELS)&&!storage.data.completed[l.id]))||chapters[0];
+    chapters.forEach((chapter,chapterIndex)=>{
+      const section=document.createElement('section');
+      section.className='level-sector'+(chapter.includes('倒映')?' inverse-sector':'')+(chapter===activeChapter?'':' collapsed');
+      const heading=document.createElement('button');heading.type='button';heading.className='level-group-title';heading.setAttribute('aria-controls',`sector-${chapterIndex}`);
+      heading.innerHTML=`<i></i><span>${chapter}</span><small>SECTOR LINK / ${LEVELS.filter(l=>l.chapter===chapter).length} NODES</small><b class="sector-toggle" aria-hidden="true"></b>`;
+      section.appendChild(heading);
+      const shell=document.createElement('div');shell.className='level-grid-shell';shell.id=`sector-${chapterIndex}`;
+      const grid=document.createElement('div');grid.className='level-grid';
+      LEVELS.forEach((l,i)=>{
+        if(l.chapter!==chapter)return;
+        const open=storage.unlocked(i,LEVELS),record=storage.data.completed[l.id],b=document.createElement('button');
+        b.className='level-card'+(open?'':' locked')+(record?' completed':'');
+        b.innerHTML=`<span class="node-marker"><i></i></span><span class="number">NODE ${String(i+1).padStart(2,'0')} ${open?'↗':'⌑'}</span><span class="stars">${record?'★'.repeat(record.stars)+'☆'.repeat(3-record.stars):'· · ·'}</span><strong>${l.name}</strong><span class="tag">${l.tag}</span><span class="node-state">${record?'SYNCHRONIZED':open?'AVAILABLE':'LOCKED'}</span>`;
+        b.onclick=()=>open?start(i):toast('请先完成前置实验节点。');grid.appendChild(b);
+      });
+      shell.appendChild(grid);section.appendChild(shell);$('level-list').appendChild(section);
+    });
     $('total-stars').textContent=`★ ${LEVELS.filter(l=>!l.inverse||storage.inverseUnlocked()).reduce((n,l)=>n+(Number(storage.data.completed[l.id]?.stars)||0),0)} / ${(storage.inverseUnlocked()?LEVELS.length:NORMAL_LEVELS.length)*3}　　◈ ${Object.keys(storage.data.shards).length} / 15 枚碎片`;
+    ui.enhanceLevels($('level-list'),$('select'));
   }
   function start(i,retry=false){
     try{validateLevel(LEVELS[i]);}catch(e){toast('关卡数据校验失败：'+e.message);return;}
@@ -53,7 +74,17 @@
   function pause(){if(g.state!=='playing')return;g.state='paused';acc=0;save();modal(`<div class="modal-code">SYSTEM / PAUSED</div><p class="eyebrow"><i></i> SIMULATION SUSPENDED</p><h2>实验已暂停</h2><p>重力场已冻结，当前实验进度已保存。</p>${btn('恢复实验','resume','primary')}${btn('重新初始化','retry')}${btn('系统设置','settings')}${btn('返回实验节点','select','flat')}${btn('返回主控界面','menu','flat')}${GamePlatform.native?btn('退出游戏','exit','flat'):''}`);}
   function win(){g.state='cleared';const stars=storage.complete(g.level.id,g.elapsed,g.resets,g.level.goal?.starTimesMs);if(storage.warning)toast(storage.warning);sound('win');const c=g.level.collector;renderer.burst(c.x,c.y,'#62e6ff',90);modal(`<div class="result-core"><i></i><span></span></div><p class="eyebrow"><i></i> CORE SYNCHRONIZED</p><h2>空间结构已稳定</h2><div class="result-stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${g.level.name} · 能量核心激活，实验数据已归档。</p><div class="result-stats"><span>实验用时 ${clock(g.elapsed)}</span><span>重置 ${g.resets} 次</span></div>${g.index<(g.level.inverse?LEVELS.length:NORMAL_LEVELS.length)-1?btn('进入下一节点 →','next','primary'):btn('返回实验节点','select','primary')}${btn('重新实验','replay')}${btn('返回选关','select','flat')}`);}
   function fail(message){if(g.state!=='playing')return;g.state='failed';sound('bad');modal(`<p class="eyebrow">TRY ANOTHER DIRECTION</p><h2>换一个方向</h2><p>${message}</p>${btn('回到起点','retry','primary')}${btn('查看提示','hint','flat')}${btn('返回选关','select','flat')}`);}
-  function settings(){const wasPlaying=g.state==='playing';if(wasPlaying)pause();g.settingsReturn=g.state;const s=storage.data.settings;modal(`<p class="eyebrow">MAKE IT YOURS</p><h2>偏好设置</h2><div class="setting-row"><span>重力灵敏度</span><select id="sensitivity" aria-label="重力灵敏度"><option value="low">低 · 0.6×</option><option value="mid">中 · 1.0×</option><option value="high">高 · 1.5×</option></select></div><div class="setting-row"><span>空间音效</span><button class="toggle" data-action="toggle-sound">${s.sound?'已开启':'已关闭'}</button></div><div class="setting-row"><span>触觉反馈</span><button class="toggle" data-action="toggle-vibrate">${s.vibrate?'已开启':'已关闭'}</button></div><p>三星需在关卡目标用时内、零重置；二星允许两次重置。堆叠与组合关有更宽松的用时目标，点 ? 查看。</p><div class="setting-row"><span>触控灵敏度</span><select id="touch-sensitivity" aria-label="触控灵敏度"><option value="0.7">低</option><option value="1">中</option><option value="1.3">高</option></select></div><div class="setting-row"><span>默认操控</span><select id="control-mode" aria-label="默认操控"><option value="manual">重力圆盘</option><option value="sensor">设备倾斜</option></select></div>${g.level?btn('校准倾斜中立位置','calibrate','flat'):''}${btn('保存并返回','settings-close','primary')}${btn('重置所有进度','erase-confirm','flat danger')}`);$('sensitivity').value=s.sensitivity;$('sensitivity').onchange=e=>{s.sensitivity=e.target.value;save();};$('touch-sensitivity').value=s.touchSensitivity;$('touch-sensitivity').onchange=e=>{s.touchSensitivity=Number(e.target.value);save();};$('control-mode').value=s.controlMode;$('control-mode').onchange=e=>{s.controlMode=e.target.value;gravity.mode=s.controlMode;g.sensorStarted=performance.now();save();};}
+  function settings(){
+    const wasPlaying=g.state==='playing';if(wasPlaying)pause();g.settingsReturn=g.state;const s=storage.data.settings;
+    modal(`<p class="eyebrow">MAKE IT YOURS</p><h2>偏好设置</h2><div class="setting-row"><span>重力灵敏度</span><select id="sensitivity" aria-label="重力灵敏度"><option value="low">低 · 0.6×</option><option value="mid">中 · 1.0×</option><option value="high">高 · 1.5×</option></select></div><div class="feedback-options"><label class="setting-row check-row feedback-master"><span>交互反馈<small>统一控制音效与触觉</small></span><input id="feedback-all" type="checkbox" aria-label="全部交互反馈"><i class="checkmark" aria-hidden="true"></i></label><label class="setting-row check-row feedback-child"><span>空间音效</span><input id="setting-sound" type="checkbox"><i class="checkmark" aria-hidden="true"></i></label><label class="setting-row check-row feedback-child"><span>触觉反馈</span><input id="setting-vibrate" type="checkbox"><i class="checkmark" aria-hidden="true"></i></label></div><p>三星需在关卡目标用时内、零重置；二星允许两次重置。堆叠与组合关有更宽松的用时目标，点 ? 查看。</p><div class="setting-row"><span>触控灵敏度</span><select id="touch-sensitivity" aria-label="触控灵敏度"><option value="0.7">低</option><option value="1">中</option><option value="1.3">高</option></select></div><div class="setting-row"><span>默认操控</span><select id="control-mode" aria-label="默认操控"><option value="manual">重力圆盘</option><option value="sensor">设备倾斜</option></select></div>${g.level?btn('校准倾斜中立位置','calibrate','flat'):''}${btn('保存并返回','settings-close','primary')}${btn('重置所有进度','erase-confirm','flat danger')}`);
+    $('sensitivity').value=s.sensitivity;$('sensitivity').onchange=e=>{s.sensitivity=e.target.value;save();};
+    $('touch-sensitivity').value=s.touchSensitivity;$('touch-sensitivity').onchange=e=>{s.touchSensitivity=Number(e.target.value);save();};
+    $('control-mode').value=s.controlMode;$('control-mode').onchange=e=>{s.controlMode=e.target.value;gravity.mode=s.controlMode;g.sensorStarted=performance.now();save();};
+    const all=$('feedback-all'),soundInput=$('setting-sound'),vibrateInput=$('setting-vibrate');
+    const syncFeedback=()=>{soundInput.checked=s.sound;vibrateInput.checked=s.vibrate;all.checked=s.sound&&s.vibrate;all.indeterminate=s.sound!==s.vibrate;all.setAttribute('aria-checked',all.indeterminate?'mixed':String(all.checked));};
+    all.onchange=()=>{s.sound=all.checked;s.vibrate=all.checked;save();syncFeedback();const panel=document.querySelector('.feedback-options');panel.classList.remove('feedback-synced');requestAnimationFrame(()=>panel.classList.add('feedback-synced'));};
+    soundInput.onchange=()=>{s.sound=soundInput.checked;save();syncFeedback();};vibrateInput.onchange=()=>{s.vibrate=vibrateInput.checked;save();syncFeedback();};syncFeedback();
+  }
   function onRuntimeEvent(type,data){
     if(type==='win')win();
     if(type==='failed')fail(data.text);
@@ -91,7 +122,6 @@
     if(a==='resume'){closeModal();g.state='playing';last=performance.now();acc=0;}
     if(a==='retry')start(g.index,true);if(a==='replay')start(g.index);if(a==='next')start(g.index+1);if(a==='menu')menu();if(a==='select')select();if(a==='settings')settings();if(a==='hint')toast(g.level.hint);
     if(a==='calibrate'){gravity.calibrate();toast('已将当前姿态设为中立位置。');}if(a==='settings-close'){if(g.settingsReturn==='paused'){g.state='playing';pause();}else menu();}
-    if(a.startsWith('toggle-')){const key=a.slice(7);storage.data.settings[key]=!storage.data.settings[key];save();settings();}
     if(a==='erase-confirm')modal(`<p class="eyebrow">RESET PROGRESS</p><h2>重新开始旅程？</h2><p>将清除本机的全部星级、解锁、碎片和最近关卡。此操作无法撤销。</p>${btn('确认清除','erase','secondary danger')}${btn('保留进度','settings','primary')}`);
     if(a==='erase'){storage.reset();menu();toast('进度已清除，新的旅程开始了。');}
     if(a==='exit')GamePlatform.exit();if(a==='close-about')menu();if(a==='debug-close')closeModal();
