@@ -19,8 +19,7 @@
     }
     save(){try{const wasCorrupt=this.corrupt;if(this.corrupt){const old=this.adapter.getItem(KEY);if(old)this.adapter.setItem(KEY+'-corrupt-backup',old);this.corrupt=false;}const old=this.adapter.getItem(KEY);if(old&&!wasCorrupt)this.adapter.setItem(KEY+'-backup',old);this.adapter.setItem(KEY,JSON.stringify(this.data));this.warning='';return true;}catch(_){this.warning='保存失败，进度暂存于内存，请检查可用空间。';return false;}}
     complete(id,time,resets,thresholds){const stars=rating(time,resets,thresholds),old=this.data.completed[id];this.data.completed[id]={stars:Math.max(old?.stars||0,stars),bestTimeMs:Math.min(old?.bestTimeMs??Infinity,time),resets:Math.min(old?.resets??Infinity,resets)};if(id.startsWith('tut_'))this.data.tutorials[id]=true;this.data.lastLevelId=null;this.save();return stars;}
-    unlocked(index,levels){const l=levels[index],previous=levels[index-1]?.id;return !!l&&(this.data.settings.adminMode|| (l.inverse?this.inverseUnlocked():index===0||!!this.data.completed[previous]||!!this.data.legacyCompleted[previous]));}
-    inverseUnlocked(){return this.data.settings.adminMode||Object.keys(this.data.shards).filter(k=>/^ch[123]_l0[1-5]$/.test(k)).length===15;}
+    unlocked(index,levels){const l=levels[index],previous=levels[index-1]?.id;return !!l&&(this.data.settings.adminMode||index===0||!!this.data.completed[previous]||!!this.data.legacyCompleted[previous]||levels.slice(index).some(next=>!!this.data.completed[next.id]||!!this.data.legacyCompleted[next.id]));}
     reset(){const settings=this.data.settings;this.data=defaults();this.data.settings=settings;return this.save();}
   }
   function rating(time,resets,thresholds=[60000,90000]){return time<=thresholds[0]&&resets===0?3:time<=thresholds[1]&&resets<=2?2:1;}
@@ -53,7 +52,7 @@
     if(!l.scaleRange||!finite(...l.scaleRange)||l.scaleRange[0]<.1||l.scaleRange[1]>3||l.scaleRange[0]>1||l.scaleRange[1]<1)fail('E_LEVEL_SCALE');
     const sources=new Set(),mechanisms=new Set();for(const m of l.mechanisms||[]){if(!['lever','door','spring','pulley'].includes(m.type)||!ids.has(m.bodyId))fail('E_LEVEL_REF');if(m.type==='pulley'&&(!ids.has(m.otherBodyId)||!finite(m.ropeY,m.minY,m.maxY)||m.minY>=m.maxY))fail('E_LEVEL_PULLEY');mechanisms.add(m.bodyId);sources.add(m.bodyId);}
     if(l.mechanisms?.some(m=>m.type==='spring')&&l.resizable&&(l.scaleRange[0]<.7||l.scaleRange[1]>1.3))fail('E_LEVEL_SCALE');
-    for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
+    for(const z of l.sensors||[]){if(!z.id||sources.has(z.id)||!['laser','wash','water','gravityField','pressure'].includes(z.type)||!finite(z.x,z.y,z.w,z.h)||z.w<=0||z.h<=0)fail('E_LEVEL_ZONE');if(z.dye&&!['red','yellow','blue'].includes(z.dye))fail('E_LEVEL_COLOR');if(z.requiresColor&&(!['white','red','yellow','blue'].includes(z.requiresColor)||z.dye||!['laser','pressure'].includes(z.type)))fail('E_LEVEL_COLOR_LOCK');if(z.force&&!finite(z.force.x,z.force.y))fail('E_LEVEL_ZONE');if(z.target&&!ids.has(z.target))fail('E_LEVEL_REF');sources.add(z.id);}
 
     const fields=(l.sensors||[]).filter(z=>z.type==='gravityField');
     if(fields.length>1||fields.some(z=>(l.baseId||l.id)!=='ch3_l02'||!z.force||z.force.x!==0||z.force.y>=0||z.force.y< -2))fail('E_LEVEL_FIELD');
@@ -64,12 +63,5 @@
     if(goal.type==='stable'&&(!goal.stableBodies?.length||goal.stableBodies.some(id=>!ids.has(id))||!(goal.stableForMs>=1000&&goal.stableForMs<=10000)||!goal.zone))fail('E_LEVEL_STABLE');
     for(const d of l.deathZones||[])if(!finite(d.x,d.y,d.w,d.h)||d.w<=0||d.h<=0)fail('E_LEVEL_DEATH');return l;
   }
-  function inverseLevel(source){
-    const l=JSON.parse(JSON.stringify(source));l.id='inv_'+source.id;l.inverse=true;l.baseId=source.id;l.name+=' · 倒映';l.chapter='倒映章 · 镜中的归途';const mirror=b=>{b.x=1920-b.x;if(b.angle!=null)b.angle=-b.angle;};
-    l.bodies.forEach(mirror);mirror(l.collector);delete l.shard;if(l.bridgeGuide)mirror(l.bridgeGuide);for(const z of l.sensors||[]){mirror(z);if(z.force)z.force.x*=-1;}for(const d of l.deathZones||[])mirror(d);
-    for(const m of l.mechanisms||[]){if(m.anchor)mirror(m.anchor);if(m.type==='door')m.openAngle=-(m.openAngle??-Math.PI/2);if(m.direction)m.direction.x*=-1;if(m.trayAngle)m.trayAngle*=-1;}
-    l.buildAreas.forEach(mirror);for(const zones of Object.values(l.placementZones||{}))zones.forEach(mirror);
-    if(l.goal?.zone)mirror(l.goal.zone);l.initialGravity={x:0,y:1};l.hint='镜像空间：道路左右翻转，重力仍然向下，工具数量不变。'+l.hint;return validateLevel(l);
-  }
-  root.GameCore={StorageService,GRAVITY,rating,validateLevel,LinkSystem,Sequence,inverseLevel};
+  root.GameCore={StorageService,GRAVITY,rating,validateLevel,LinkSystem,Sequence};
 })(typeof window!=='undefined'?window:globalThis);

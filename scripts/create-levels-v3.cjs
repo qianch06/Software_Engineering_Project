@@ -57,7 +57,8 @@ function spring(id,name,chapter){
  l.tutorial=['① 点左下「画线」，沿两个圆点之间的虚线画一笔，松手生成缓坡。','② 导流线已生成。点「释放」，让小球沿你画的坡滚过去。','③ 画线也能承接和导流。以后可以自己决定坡度与画法。'];
 }
 levels.slice(0,3).forEach(l=>{l.goal.starTimesMs=[300000,600000];});
-bridge('ch1_l01','微光的轨迹',1);
+// The first chapter previously repeated the first tutorial's exact bridge and solution.
+// Start the formal campaign with a new mechanism instead.
 lever('ch1_l02','两端之间',1);
 {
  const l=bridge('ch1_l03','光的回声',1);echoGate(l,650,510,180);
@@ -108,17 +109,37 @@ function waterRoute(id,name){
  l.sensors=[{id:'water',type:'water',x:520,y:620,w:600,h:220,force:{x:.25,y:0}}];l.tag='水平水流 / 出口桥';l.intro='小球落在水平河床上，只有水流能推它出发。搭好出口桥，把水的推力接到终点。';l.hint='这里没有起步斜坡。箭头表示水流方向；水平放板衔接两岸，离开水流后由已有速度和下坡继续前进。';return add(l,[board(960,700,0)]);
 }
 {
- const l=steppingRoute('ch3_l04','三色回廊',3);l.tag='三色顺序 / 洗色归白';
- l.sensors=[{id:'red',type:'laser',x:480,y:450,w:18,h:160,dye:'red'},{id:'yellow',type:'laser',x:1000,y:590,w:18,h:140,dye:'yellow'},{id:'blue',type:'laser',x:1390,y:690,w:18,h:140,dye:'blue'},{id:'wash',type:'wash',x:1530,y:735,w:70,h:120}];l.goal.colorChain=['red','yellow','blue'];l.collector.acceptColor='white';
- l.intro='让小球依次记下红、黄、蓝三种光，再经过洗色区恢复白色，回到白色收集器。';l.hint='两段导流线把三处颜色站连起来。顶部记录颜色经过顺序；洗色只清除球当前颜色，不抹掉走过的顺序。缺少颜色或没洗回白色都不能入仓。';
+ const l=steppingRoute('ch3_l04','错位的色钥',3);l.tag='红蓝色锁 / 错位路线';
+ l.sensors=[
+  {id:'red',type:'laser',x:480,y:450,w:18,h:160,dye:'red',label:'红染光'},
+  {id:'redLock',type:'laser',x:740,y:460,w:18,h:20,requiresColor:'red',label:'高处红锁'},
+  {id:'blue',type:'laser',x:1390,y:690,w:18,h:140,dye:'blue',label:'蓝染光'},
+  {id:'blueLock',type:'laser',x:1460,y:700,w:18,h:60,requiresColor:'blue',label:'蓝锁'},
+  {id:'yellow',type:'laser',x:1545,y:825,w:18,h:40,dye:'yellow',label:'误染黄光'}
+ ];
+ l.bodies.push(rect('gate',1590,540,24,600,{category:'door'}));
+ l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1590,y:240},openAngle:-Math.PI/2,durationMs:250,requireSequence:true}];
+ l.links=[{source:'blueLock',target:'gate',semantic:'once'}];
+ l.goal.sequence=['redLock','blueLock'];l.goal.colorChain=['red','blue'];l.collector.acceptColor='blue';
+ l.intro='红与蓝两把色钥分别藏在两段路线。高处红锁要求第一段路线足够平缓；低处黄光会覆盖蓝色。';
+ l.hint='第一段画得更平缓，让球染红后碰到高处红锁；再接到中间平台。第二段先染蓝再触发蓝锁，末端避开低处黄光并保持蓝色入仓。';
+ solutions[l.id]=[line([668,520],[882,540]),line([1098,640],[1312,710])];
 }
 {
- const l=waterRoute('ch3_l05','回廊的回声');l.tag='综合 / 水流 / 三色 / 限时光门';
+ const l=waterRoute('ch3_l05','回廊的回声');l.tag='综合 / 水流 / 三色锁 / 限时光门';
  l.boards=2;l.boardSpec={w:290,h:18};l.bodies=l.bodies.filter(b=>!['start','end'].includes(b.id));l.bodies.push(rect('start',440,700,420,20),ramp('end',1250,745,1730,820));l.buildAreas=[{x:950,y:700,w:650,h:170}];l.sensors[0]={id:'water',type:'water',x:440,y:620,w:440,h:220,force:{x:.25,y:0}};
- l.sensors.push({id:'red',type:'laser',x:460,y:650,w:18,h:140,dye:'red'},{id:'yellow',type:'laser',x:900,y:650,w:18,h:140,dye:'yellow'},{id:'blue',type:'laser',x:1290,y:680,w:18,h:160,dye:'blue'},{id:'wash',type:'wash',x:1560,y:740,w:70,h:140});
- l.bodies.push(rect('gate',1450,540,24,600,{category:'door'}));l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1450,y:240},requireSequence:true,openAngle:-Math.PI/2}];l.links=[{source:'blue',target:'gate',semantic:'pulse',durationMs:4000}];l.goal.colorChain=['red','yellow','blue'];l.collector.acceptColor='white';
- l.intro='让回廊回应完整的三色旅程：水流推动小球，两块桥板接力，集齐三色后光门回应4秒，再洗回白色入仓。';l.hint='综合第二章双板桥和本章水流、四秒光门、三色洗色。两块板接成向终点缓降的长桥跨过宽缺口；缺水流不能出发，缺桥会跌落，缺任一颜色门不回应。';
- solutions[l.id]=[board(800,710,.07),board(1100,731,.07)];const end=l.bodies.find(b=>b.id==='end');l.shard={x:1620,y:end.y+(1620-end.x)*Math.tan(end.angle)-(24+end.h/2)/Math.cos(end.angle)};
+ l.sensors.push(
+  {id:'red',type:'laser',x:460,y:650,w:18,h:140,dye:'red',label:'红染光'},
+  {id:'redLock',type:'laser',x:660,y:650,w:18,h:70,requiresColor:'red',label:'A 红锁'},
+  {id:'yellow',type:'laser',x:900,y:650,w:18,h:140,dye:'yellow',label:'黄染光'},
+  {id:'yellowLock',type:'laser',x:1110,y:650,w:18,h:25,requiresColor:'yellow',label:'B 高处黄锁'},
+  {id:'blue',type:'laser',x:1290,y:680,w:18,h:160,dye:'blue',label:'蓝染光'},
+  {id:'blueLock',type:'laser',x:1370,y:710,w:18,h:70,requiresColor:'blue',label:'C 蓝锁'},
+  {id:'wash',type:'wash',x:1540,y:825,w:65,h:40,label:'低处洗色区'}
+ );
+ l.bodies.push(rect('gate',1450,540,24,600,{category:'door'}));l.mechanisms=[{type:'door',bodyId:'gate',anchor:{x:1450,y:240},requireSequence:true,openAngle:-Math.PI/2,durationMs:220}];l.links=[{source:'blueLock',target:'gate',semantic:'pulse',durationMs:4000}];l.goal.sequence=['redLock','yellowLock','blueLock'];l.goal.colorChain=['red','yellow','blue'];l.collector.acceptColor='blue';
+ l.intro='水流启动长桥，红黄蓝三把色锁依次传信。高处黄锁要求桥面保持高度；门只短暂开启，低处洗色区可能抹去蓝色。';l.hint='第一块板铺得较平，保留到高处黄锁的高度；第二块板接到蓝锁与光门。按红→黄→蓝触发同色锁，末端避开低处洗色区，带蓝色入仓。';
+ solutions[l.id]=[board(800,700,.04),board(1100,720,.07)];const end=l.bodies.find(b=>b.id==='end');l.shard={x:1620,y:end.y+(1620-end.x)*Math.tan(end.angle)-(24+end.h/2)/Math.cos(end.angle)};
 }
 const teaching={
  ch2_l01:['缺口超过一块板的长度：把两块木板接成连续缓坡。','检查两块板的接缝和两岸落差，避免中间出现台阶。','观察：第一块承接起点，第二块把路线延长到终点。'],
@@ -129,8 +150,8 @@ const teaching={
  ch3_l01:['搭一段连续下坡桥；球触发光束后，门只打开4秒。','检查桥面不要形成凹槽；过慢的路线会错过开门窗口。','看门旁倒计时。门关闭后可返回准备，调整坡度重试。'],
  ch3_l02:['画入口导坡送球入井，再用木板承接上方出口。','检查井的入口和出口；升流只在标出的范围内有效。','观察：乘升流上升，离井后重新下落，由出口板承接。'],
  ch3_l03:['水流推动水平河床上的球。用水平木板连接出口缺口。','检查两岸与桥面的高度；箭头就是水的推动方向。','观察：水流提供起步动力，桥面承接，出水后继续滑行。'],
- ch3_l04:['画两段路线经过红、黄、蓝三站，最后洗回白色。','检查两段承接；顶部记录颜色顺序，白色收集器要求洗色。','观察：三色记录保留，洗色只清除当前颜色。'],
- ch3_l05:['用两块板搭长缓坡桥，连接水流出口与三色光门。','检查两块板的接缝：水流 → 三色 → 四秒开门 → 洗白入仓。','观察完整联动；门只回应三色齐备的旅程，最后还要洗色。']
+ ch3_l04:['画两段路线，第一段需要保持高度，让染红的球碰到高处红锁。','接住中间平台，再画第二段让球染蓝、触发蓝锁；低处黄光会覆盖蓝色。','观察：坡度决定是否碰到色锁；最终仍须保持蓝色入仓。'],
+ ch3_l05:['第一块板要铺平并抬高路径，让球碰到高处黄锁。','检查第二块板的接缝、红黄蓝顺序与四秒门；低处洗色区会抹去蓝色。','观察：水流 → 高处黄锁 → 蓝锁 → 限时光门 → 蓝色入仓。']
 };
 for(const l of levels)if(teaching[l.id])l.tutorial=teaching[l.id].map((text,i)=>['① ','② ','③ '][i]+text);
 const root=path.resolve(__dirname,'..');fs.mkdirSync(path.join(root,'tests/fixtures'),{recursive:true});fs.writeFileSync(path.join(root,'static/game/data/levels.json'),JSON.stringify(levels,null,2)+'\n');fs.writeFileSync(path.join(root,'tests/fixtures/solutions.json'),JSON.stringify(solutions,null,2)+'\n');console.log('Authored '+levels.length+' fixed-gravity layouts and preparation replays.');

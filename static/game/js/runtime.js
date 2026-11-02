@@ -3,14 +3,14 @@
   const inside=(b,z,pad=0)=>Math.abs(b.x-z.x)<z.w/2+pad&&Math.abs(b.y-z.y)<z.h/2+pad;
   class LevelRuntime {
     constructor(level,physics,emit=()=>{}){
-      GameCore.validateLevel(level);this.level=level;this.physics=physics;this.emit=emit;this.phase='preparing';this.time=0;this.color='white';this.capture=0;this.stable=0;this.done=false;this.failed=false;this.zones={};this.doors={};this.cooldowns={};this.collectedShards=false;physics.gravity(GameCore.GRAVITY);
+      GameCore.validateLevel(level);this.level=level;this.physics=physics;this.emit=emit;this.phase='preparing';this.time=0;this.color='white';this.capture=0;this.stable=0;this.done=false;this.failed=false;this.zones={};this.contacts={};this.doors={};this.cooldowns={};this.collectedShards=false;physics.gravity(GameCore.GRAVITY);
       const links=[...(level.links||[])];for(const z of level.sensors||[])if(z.target&&!links.some(l=>l.source===z.id&&l.target===z.target))links.push({source:z.id,target:z.target,semantic:'once'});
       this.links=new GameCore.LinkSystem(links);this.sequence=new GameCore.Sequence(level.goal?.sequence);this.colors=new GameCore.Sequence(level.goal?.colorChain);
       level.bodies.forEach(b=>physics.add(b));for(const m of level.mechanisms)if(m.type==='lever')physics.pin(m.bodyId,m.anchor);
     }
     source(id,active,x,y){
       this.links.source(id,active);
-      if(active){if(this.sequence.expected.includes(id)&&!this.sequence.hit(id))this.emit('wrong',{text:'顺序还不对，请先触发 '+this.sequence.expected[this.sequence.index]});
+      if(active){if(this.sequence.expected.includes(id)&&!this.sequence.hit(id))this.emit('wrong',{text:'顺序还不对，请先触发 '+(this.level.sensors.find(z=>z.id===this.sequence.expected[this.sequence.index])?.label||this.sequence.expected[this.sequence.index])});
         for(const l of this.links.links.filter(l=>l.source===id&&l.active)){const b=this.physics.get(l.target);this.emit('link',{x,y,tx:b.x,ty:b.y,time:this.time});}
       }
     }
@@ -43,7 +43,10 @@
         }
       }
       for(const z of l.sensors){
-        const touching=z.type==='pressure'?p.all().some(b=>!b.isStatic&&inside(b,z,b.r||Math.min(b.w,b.h)/2)):inside(ball,z,ball.r);
+        const contact=z.type==='pressure'?p.all().some(b=>!b.isStatic&&inside(b,z,b.r||Math.min(b.w,b.h)/2)):inside(ball,z,ball.r);
+        const touching=contact&&(!z.requiresColor||this.color===z.requiresColor);
+        if(contact&&z.requiresColor&&!touching&&!this.contacts[z.id])this.emit('wrong',{text:(z.label||z.id)+'需要'+({white:'白',red:'红',yellow:'黄',blue:'蓝'}[z.requiresColor])+'色能量球；可返回准备调整路径。'});
+        this.contacts[z.id]=contact;
         if(touching!==!!this.zones[z.id]){
           if(touching){if(z.dye){this.color=z.dye;if(this.colors.expected.includes(z.dye)&&!this.colors.hit(z.dye))this.emit('wrong',{text:'颜色顺序不符，请返回准备调整路线。'});}if(z.type==='wash')this.color='white';this.emit('sensor',{x:ball.x,y:ball.y,color:this.color});}
           this.source(z.id,touching,z.x,z.y);this.zones[z.id]=touching;
