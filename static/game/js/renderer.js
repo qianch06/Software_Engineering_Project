@@ -1,5 +1,5 @@
 (function(root){
-  const colors={white:'#eef4f0',red:'#f18d88',blue:'#91bde6',yellow:'#f4d17b'};
+  const colors={white:'#ffdd91',red:'#f18d88',blue:'#91bde6',yellow:'#f4d17b'};
   class Renderer {
     constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.fx=[];this.resize();window.addEventListener('resize',()=>this.resize());}
     resize(){const d=Math.min(devicePixelRatio||1,2);this.canvas.width=Math.round(innerWidth*d);this.canvas.height=Math.round(innerHeight*d);this.dpr=d;this.factor=Math.min(innerWidth/1920,innerHeight/1080);this.ox=(innerWidth-1920*this.factor)/2;this.oy=(innerHeight-1080*this.factor)/2;}
@@ -10,8 +10,8 @@
     circle(x,y,r,color,stroke,width=1){const c=this.ctx;c.beginPath();c.arc(x,y,r,0,Math.PI*2);if(color){c.fillStyle=color;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=width;c.stroke();}}
     text(s,x,y,color='#a9bdb4',size=20){const c=this.ctx;c.font=`${size}px 'Segoe UI','Microsoft YaHei',sans-serif`;c.fillStyle=color;c.fillText(s,x,y);}
     glow(x,y,r,color){const c=this.ctx;const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color);g.addColorStop(1,'transparent');this.circle(x,y,r,g);}
-    background(time){const c=this.ctx;for(let x=80;x<1900;x+=100)for(let y=170;y<950;y+=100)this.circle(x,y,1,'#abcbb815');this.path([{x:0,y:970},{x:260,y:880},{x:520,y:960},{x:920,y:850},{x:1270,y:940},{x:1620,y:830},{x:1920,y:940},{x:1920,y:1080},{x:0,y:1080}],'#0b191e55');for(let i=0;i<22;i++){const x=(i*397%1900)+10,y=200+(i*139+time*0.005)%650;this.circle(x,y,1.5,'#b9d9bc33');}}
-    menu(time){this.begin();this.background(time);const c=this.ctx;const cx=1370,cy=500;this.glow(cx,cy,530,'#7ca78313');c.save();c.strokeStyle='#9ec3aa25';c.lineWidth=1;for(const r of [270,300,420]){c.beginPath();c.arc(cx,cy,r,-Math.PI*.95,Math.PI*.83);c.stroke();}this.line(cx-480,cy,cx+480,cy,'#9ec3aa10');this.line(cx,100,cx,950,'#9ec3aa10');for(let i=0;i<36;i++){const a=i*Math.PI/18;this.line(cx+Math.cos(a)*420,cy+Math.sin(a)*420,cx+Math.cos(a)*427,cy+Math.sin(a)*427,'#b4d4bc38');}c.translate(cx,cy);c.rotate(-.15+Math.sin(time*.0004)*.025);this.path([{x:-310,y:80},{x:-70,y:80},{x:-70,y:140},{x:-310,y:140}],'#607c6e','#a9c4a480',2);this.path([{x:30,y:140},{x:285,y:140},{x:285,y:200},{x:30,y:200}],'#496758','#a9c4a460',2);this.path([{x:-90,y:140},{x:-45,y:225},{x:0,y:140}],'#274438','#8daa8b55',2);this.circle(-45,137,9,'#acc4a2');this.path([{x:165,y:200},{x:165,y:300},{x:215,y:300},{x:215,y:200}],'#233f36');c.restore();const bx=cx-180+Math.sin(time*.0006)*80,by=cy+25+Math.sin(time*.0007)*13;this.glow(bx,by,120,'#e6c57c22');this.circle(bx,by,31,'#e5ca8a','#fff1c0',2);this.circle(bx-8,by-9,10,'#fff4ce33');this.circle(cx+185,cy+105,49,null,'#a5d4b5',3);this.circle(cx+185,cy+105,38,null,'#a5d4b53d',1);this.text('引 力',cx+130,cy-240,'#a5d4b56e',18);this.text('G = POSSIBILITY',cx-65,cy+350,'#9fb5a655',13);c.save();c.translate(cx+5,cy-120);c.rotate(time*.0001);this.path([{x:0,y:-26},{x:14,y:0},{x:0,y:26},{x:-14,y:0}],null,'#bad3b87a',2);c.restore();}
+    background(time){const c=this.ctx;for(let x=80;x<1900;x+=100)for(let y=170;y<950;y+=100)this.circle(x,y,1,'#62bfff16');this.path([{x:0,y:970},{x:260,y:880},{x:520,y:960},{x:920,y:850},{x:1270,y:940},{x:1620,y:830},{x:1920,y:940},{x:1920,y:1080},{x:0,y:1080}],'#030a1655');for(let i=0;i<22;i++){const x=(i*397%1900)+10,y=200+(i*139+time*0.005)%650;this.circle(x,y,1.5,'#8fbfff38');}}
+    menu(time){this.begin();this.background(time);const c=this.ctx,cx=1370,cy=500;this.glow(cx,cy,540,'#397dcb16');c.save();c.strokeStyle='#62bfff22';c.lineWidth=1;for(const r of [270,300,420]){c.beginPath();c.arc(cx,cy,r,-Math.PI*.95,Math.PI*.83);c.stroke();}this.line(cx-500,cy,cx+500,cy,'#62bfff12');this.line(cx,90,cx,950,'#62bfff12');for(let i=0;i<36;i++){const a=i*Math.PI/18;this.line(cx+Math.cos(a)*420,cy+Math.sin(a)*420,cx+Math.cos(a)*427,cy+Math.sin(a)*427,'#72cfff40');}for(let i=0;i<7;i++){const y=690+i*45,w=330+i*95;this.line(cx-w,y,cx+w,y,'#62bfff12');}this.line(cx-330,690,cx-900,1080,'#62bfff12');this.line(cx+330,690,cx+900,1080,'#62bfff12');this.path([{x:1040,y:850},{x:1650,y:850},{x:1740,y:900},{x:960,y:900}],'#0b1c30aa','#62bfff28',2);this.text('重力核心 · 运行稳定',cx-90,cy+385,'#76a9ca66',13);c.save();c.translate(cx,cy);c.rotate(time*.00008);for(const r of [180,230]){c.setLineDash([22,18]);this.circle(0,0,r,null,'#62e6ff24',2);}c.restore();c.restore();}
     burst(x,y,color,count=28){for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,v=1+Math.random()*5;this.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,color});}this.fx=this.fx.slice(-200);}
     fluid(z,time){
       const c=this.ctx,water=z.type==='water',color=water?'#83c9df':'#c7b1e8',left=z.x-z.w/2,top=z.y-z.h/2;
@@ -20,6 +20,20 @@
       const direction=z.force||{x:0,y:0},length=Math.hypot(direction.x,direction.y)||1,dx=direction.x/length,dy=direction.y/length;
       for(let row=0;row<3;row++)for(let col=0;col<5;col++){const x=left+25+(col+.3)*(z.w-50)/5,y=top+35+(row+.5)*(z.h-60)/3,shift=Math.sin(time*.002+row+col)*8,ax=x+dx*shift,ay=y+dy*shift,bx=ax+dx*30,by=ay+dy*30;this.line(ax,ay,bx,by,color+'88',2);this.line(bx,by,bx-dx*9-dy*5,by-dy*9+dx*5,color+'88',2);this.line(bx,by,bx-dx*9+dy*5,by-dy*9-dx*5,color+'88',2);}
       this.text(z.label||(water?'水面 · 浮力':'气流'),left+8,top-16,color,Math.max(18,10/this.factor));c.restore();
+    }
+    glassBall(ball,color){
+      const c=this.ctx,r=ball.r;if(this.quality!==2)this.glow(ball.x,ball.y,r*2.4,color+'16');
+      c.save();c.translate(ball.x,ball.y);
+      const body=c.createRadialGradient(-r*.28,-r*.34,r*.04,0,0,r);
+      body.addColorStop(0,'#fff8def2');body.addColorStop(.22,color+'f2');body.addColorStop(.58,color+'c8');body.addColorStop(.84,'#f0bc6755');body.addColorStop(1,color+'e8');
+      this.circle(0,0,r,body,'#fff0c4d8',1.4);
+      c.save();c.rotate(ball.angle*.3);c.beginPath();c.arc(0,0,r*.76,.15,Math.PI*1.28);c.strokeStyle=color+'70';c.lineWidth=Math.max(1,r*.05);c.stroke();c.restore();
+      c.save();c.translate(r*.12,r*.4);c.scale(1,.3);this.circle(0,0,r*.48,'#fff0b82e');c.restore();
+      c.beginPath();c.arc(0,0,r*.91,Math.PI*.12,Math.PI*.72);c.strokeStyle='#f3c67670';c.lineWidth=Math.max(1,r*.04);c.stroke();
+      c.beginPath();c.arc(0,0,r*.92,Math.PI*1.08,Math.PI*1.62);c.strokeStyle='#fffbe6d0';c.lineWidth=Math.max(1,r*.055);c.stroke();
+      c.save();c.translate(-r*.32,-r*.4);c.rotate(-.55);c.scale(1,.42);this.circle(0,0,r*.3,'#fffbe6a0');c.restore();
+      this.circle(-r*.45,-r*.52,Math.max(1.5,r*.075),'#ffffffee');
+      c.restore();
     }
     game(g,time){this.begin();this.background(time);const c=this.ctx,l=g.runtime.level;
       this.line(80,950,1840,950,'#abcbb815');
@@ -38,7 +52,7 @@
       if(l.shard&&!g.storage.data.shards[l.id]){const s=l.shard;this.glow(s.x,s.y,70,'#dfc38218');c.save();c.translate(s.x,s.y+Math.sin(time*.002)*7);this.path([{x:0,y:-20},{x:13,y:0},{x:0,y:20},{x:-13,y:0}],'#dfc38222','#dfc382',2);c.restore();}
       for(const b of g.physics.all()){
         if(b.id==='ceiling')continue;
-        if(b.category==='energyBall'){const color=colors[g.ballColor];if(this.quality!==2)this.glow(b.x,b.y,b.r*3,color+'22');this.circle(b.x,b.y,b.r,color,color,2);this.circle(b.x-b.r*.25,b.y-b.r*.3,b.r*.25,'#fff8dc55');if(l.resizable){c.save();c.setLineDash([5,6]);this.circle(b.x,b.y,b.r+12,null,'#dddac277',1);c.restore();}continue;}
+        if(b.category==='energyBall'){this.glassBall(b,colors[g.ballColor]);if(l.resizable){c.save();c.setLineDash([5,6]);this.circle(b.x,b.y,b.r+12,null,'#dddac277',1);c.restore();}continue;}
         let fill='#36524b',stroke='#80998a';if(b.category==='taskCube'){fill='#887b5a';stroke='#dfce9b';}if(b.category==='pulley'){fill='#6b8075';stroke='#c8d6b4';}if(b.id==='float')this.text('浮块',b.x-22,b.y+6,'#dfce9b',Math.max(18,9/this.factor));if(b.category==='wood'){fill='#796e50';stroke='#c9b683';}if(b.category==='line'){fill='#a5d4b5';stroke='#c5e4c7';}if(b.category==='door'){fill='#4d6964';stroke='#b5c8ab';}if(b.category==='lever'){fill='#758472';stroke='#c4cfad';}if(b.category==='spring'){fill='#786a8d';stroke='#c1abd9';}
         this.path(b.vertices,fill,stroke,2);if(b.category==='terrain'&&b.id!=='ceiling'&&b.id!=='left'&&b.id!=='right'){this.line(b.vertices[0].x,b.vertices[0].y,b.vertices[1].x,b.vertices[1].y,'#b4c8a84d',3);}
         if(b.id==='float')this.text('浮块',b.x-22,b.y+6,'#dfce9b',Math.max(18,9/this.factor));if(b.category==='wood'){this.line(b.x-80,b.y,b.x+80,b.y,'#c9b68355',2);}
