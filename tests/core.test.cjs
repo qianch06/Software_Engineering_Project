@@ -1,21 +1,13 @@
-const {test}=require('node:test');
-const assert=require('node:assert/strict');
-require('../static/game/js/core.js');
-global.Matter=require('../static/game/vendor/matter.min.js');
-require('../static/game/js/physics.js');
-require('../static/game/js/levels.js');
-const {StorageService,GravityController,validateLevel,rating}=global.GameCore;
-test('全部 18 关合法，悬空引用、非法尺寸和缺少洗色区均被拒绝',()=>{
-  assert.equal(LEVELS.length,18);LEVELS.forEach(validateLevel);
-  const bad=structuredClone(LEVELS[0]);bad.bodies[0].w=-2;assert.throws(()=>validateLevel(bad));
-  const ref=structuredClone(LEVELS[5]);ref.sensors[0].target='missing';assert.throws(()=>validateLevel(ref));
-  const color=structuredClone(LEVELS[16]);color.sensors=color.sensors.filter(s=>s.type!=='wash');assert.throws(()=>validateLevel(color));
-});
-test('缩放遵守密度守恒，质量随面积变化',()=>{const p=new PhysicsService();p.add({id:'ball',type:'circle',x:200,y:200,r:40});const m=p.get('ball').mass;p.scale('ball',.5);assert.ok(Math.abs(p.get('ball').mass/m-.25)<.001);p.dispose();});
-test('固定步长双跑结果一致，十八关分别推进 20 秒无 NaN',()=>{
-  function run(l){const p=new PhysicsService();l.bodies.forEach(b=>p.add(b));l.mechanisms.filter(m=>m.type==='lever').forEach(m=>p.pin(m.bodyId,m.anchor));p.gravity({x:.4,y:.8});for(let i=0;i<1200;i++)p.step();const b=p.get('ball');p.dispose();return [b.x,b.y];}
-  for(const l of LEVELS){const a=run(l),b=run(l);assert.ok(a.every(Number.isFinite));assert.deepEqual(a,b);}
-});
-test('重力滤波与死区；归一化和灵敏度',()=>{const c=new GravityController();c.value={x:0,y:0};c.sample(0,0,1);for(let i=0;i<60;i++)c.update(16.67);assert.ok(Math.hypot(c.value.x,c.value.y)<.05);c.target={x:1,y:0};for(let i=0;i<120;i++)c.update(16.67,'low');assert.ok(Math.abs(c.value.x-.6)<.001);});
-test('重玩保留最优星级/时间，解锁、最近关卡和设置持久化',()=>{const data=new Map(),adapter={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};const s=new StorageService(adapter);assert.equal(s.unlocked(1,LEVELS),false);s.complete(LEVELS[0].id,15000,0);s.complete(LEVELS[0].id,110000,4);assert.equal(s.data.completed.tut_grav.stars,3);assert.equal(s.data.completed.tut_grav.bestTimeMs,15000);s.data.settings.sound=false;s.data.lastLevelId='tut_mech';s.save();const restored=new StorageService(adapter);assert.equal(restored.unlocked(1,LEVELS),true);assert.equal(restored.data.settings.sound,false);assert.equal(restored.data.lastLevelId,'tut_mech');});
-test('损坏存档与存储失败安全降级，评分阈值正确',()=>{const s=new StorageService({getItem:()=>'{bad',setItem:()=>{throw Error('quota');}});assert.ok(s.warning);assert.equal(s.save(),false);assert.equal(rating(59000,0),3);assert.equal(rating(70000,1),2);assert.equal(rating(100000,0),1);});
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const{levels,scene,solutions,action}=require('./helpers.cjs');
+test('18 个关卡使用新规则；离线脚本与 JSON 同步',()=>{require('../static/game/js/levels.js');assert.deepEqual(LEVELS,levels);assert.equal(levels.length,18);levels.forEach(l=>assert.equal(GameCore.validateLevel(l),l));});
+test('校验拒绝旧规则、可变重力、非法工具区和未授权方块',()=>{for(const mutate of [l=>delete l.rulesVersion,l=>l.initialGravity.x=1,l=>l.buildAreas=[],l=>l.boardSpec.w=NaN,l=>{l.draggable=['ball'];l.placementZones.ball=[{x:300,y:400,w:200,h:200}];}]){const l=structuredClone(levels[0]);mutate(l);assert.throws(()=>GameCore.validateLevel(l));}});
+test('只有指定升流井关可有固定向上的局部场',()=>{const l=structuredClone(levels.find(l=>l.id==='ch3_l02'));l.sensors[0].force.x=.1;assert.throws(()=>GameCore.validateLevel(l));l.sensors[0].force.x=0;l.id='ch1_l01';assert.throws(()=>GameCore.validateLevel(l));});
+test('轮廓区域并集检查覆盖内部，不只看外接框或顶点',()=>{const p=[{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10}];assert.equal(PuzzleGeometry.covered(p,[{x:2.5,y:5,w:5,h:10},{x:7.5,y:5,w:5,h:10}]),true);assert.equal(PuzzleGeometry.covered(p,[{x:1,y:5,w:2,h:10},{x:9,y:5,w:2,h:10}]),false);});
+test('缩放密度守恒；扩大穿入已有刚体被拒绝',()=>{const s=scene('tut_hand'),m=s.physics.get('ball').mass;assert.equal(s.scaleBall(.5),true);assert.ok(Math.abs(s.physics.get('ball').mass/m-.25)<.001);const b=s.physics.get('ball');s.physics.add({id:'blocker',type:'rect',x:b.x+30,y:b.y,w:10,h:40,isStatic:true});assert.equal(s.scaleBall(1),false);s.dispose();});
+function adapter(map){return{getItem:k=>map.get(k),setItem:(k,v)=>map.set(k,v)};}
+test('0.2 解锁、碎片、旧成绩保留；新成绩和教程独立，旧输入设置消失',()=>{const old={version:2,settings:{sound:false,sensitivity:'high',controlMode:'sensor'},completed:{tut_grav:{stars:3,bestTimeMs:1000,resets:0}},shards:{ch1_l01:true},lastLevelId:'tut_mech'},map=new Map([['gravity-shift-v2',JSON.stringify(old)]]),s=new GameCore.StorageService(adapter(map));assert.deepEqual(s.data.completed,{});assert.equal(s.data.legacyCompleted.tut_grav.stars,3);assert.equal(s.data.shards.ch1_l01,true);assert.equal(s.data.settings.sound,false);assert.equal(s.unlocked(1,levels),true);assert.equal(s.data.settings.controlMode,undefined);assert.equal(s.data.settings.sensitivity,undefined);s.complete('tut_grav',40000,0);assert.equal(s.data.tutorials.tut_grav,true);const restored=new GameCore.StorageService(adapter(map));assert.equal(restored.data.completed.tut_grav.bestTimeMs,40000);assert.equal(restored.data.legacyCompleted.tut_grav.bestTimeMs,1000);});
+test('损坏存档恢复备份，坏档原文隔离，写失败可重试',()=>{const map=new Map([['gravity-shift-v2','broken'],['gravity-shift-v2-backup',JSON.stringify({version:2,rulesVersion:3,completed:{},shards:{},settings:{sound:false}})]]),s=new GameCore.StorageService(adapter(map));assert.ok(s.warning.includes('备份'));assert.equal(s.data.settings.sound,false);s.save();assert.equal(map.get('gravity-shift-v2-corrupt-backup'),'broken');const broken=new GameCore.StorageService({getItem:()=>null,setItem:()=>{throw Error('quota');}});assert.equal(broken.save(),false);});
+test('评分、历史最优、碎片解锁与重置',()=>{const s=new GameCore.StorageService(adapter(new Map()));s.complete('tut_grav',30000,0);s.complete('tut_grav',100000,3);assert.equal(s.data.completed.tut_grav.stars,3);assert.equal(GameCore.rating(70000,1),2);for(const l of levels.filter(l=>l.id.startsWith('ch')))s.data.shards[l.id]=true;assert.equal(s.inverseUnlocked(),true);s.reset();assert.equal(s.inverseUnlocked(),false);});
+test('镜像保持库存、重力、场方向并变换建造和配重区域',()=>{for(const l of levels.filter(l=>l.id.startsWith('ch'))){const m=GameCore.inverseLevel(l);assert.deepEqual(m,GameCore.inverseLevel(l));assert.deepEqual(m.initialGravity,{x:0,y:1});assert.equal(m.boards,l.boards);assert.equal(m.lines,l.lines);assert.equal(m.collector.x,1920-l.collector.x);for(let i=0;i<l.buildAreas.length;i++)assert.equal(m.buildAreas[i].x,1920-l.buildAreas[i].x);for(const id of l.draggable)assert.equal(m.placementZones[id][0].x,1920-l.placementZones[id][0].x);}});
+test('同一合法操作与固定步长产生相同结果',()=>{const results=[];for(let n=0;n<2;n++){const s=scene('ch2_l01');solutions.ch2_l01.forEach(a=>assert.ok(action(s,a)));s.release();for(let i=0;i<120;i++)s.tick(1000/60);results.push(s.physics.get('ball'));s.dispose();}assert.deepEqual(results[0],results[1]);});

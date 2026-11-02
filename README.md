@@ -1,22 +1,24 @@
 # 失衡空间 · Gravity Shift 0.2
 
+> **玩法设计更新（0.3，待实现）**：针对自由重力绕过跷跷板、搭桥和画线的问题，需求与设计已修订为“固定向下重力 + 准备建造 + 释放观察”，仅后期保留一关固定升流井。详见 [重力与机关玩法重构方案](docs/05-重力与机关玩法重构方案.md)。当前游戏代码、操作方式与下文测试仍对应 0.2；本次只更新文档，不代表 0.3 已可试玩。
+
 基于需求文档与游戏设计文档扩展的单机物理解谜游戏。包含 **3 个教学关 + 3 章各 5 关 + 15 个可解锁倒映关**。所有游戏资源随包提供，运行无需联网。
 
 ## HBuilderX 运行与 APK 云打包
 
-**当前发布目标只有 Android APK。** H5 可用于浏览器调试；APK 应使用 HBuilderX 的“原生 App 云打包”。
+**同一 uni-app Vue3 工程支持 H5 与 Android App。H5 发布产物是网页；APK 应使用“App 云打包”，不能把“发行 H5”当成 APK 打包。**
 
 1. HBuilderX → 文件 → 导入 → 从本地目录导入，选择本项目根目录。保持 uni-app / Vue3 类型，安装 HBuilderX 提示的 Vue3 编译插件。
 2. 运行 → 运行到浏览器 → Chrome，验证 H5。项目根 `index.html` 是标准 uni-app 入口，不再跳转绕过 Vue 编译。游戏由页面内的本地 WebView 承载。
-3. 打开本项目 `manifest.json` 的“基础配置”，在 HBuilderX 登录自己的 DCloud 账号，点击“应用标识（AppID）”后方的**获取/重新获取**。当前字段为空，旧的无效占位值已清除。AppID 由 DCloud 分配，你不用把它发给我，也不要自己编造。
-4. 工程仅保留 Android 发布配置：名称“失衡空间”、版本 `0.2.0 / 200`、横屏，包名暂为 `com.gravityshift.game`。如果云打包校验提示包名尚未在开发者中心录入，它是警告；请按 HBuilderX 提示在应用详情中录入或换用你已登记的包名。后续更新 APK 时应保持相同包名和签名。
+3. 打开 `manifest.json` 可视化界面，登录自己的 DCloud 账号，点击获取/重新获取 **DCloud AppID**。当前 `__UNI__GRAVITYSHIFT` 是旧 Demo 的占位值，**必须替换为自己账号下真实 AppID**。不要使用他人的 AppID。
+4. App 常用配置：名称“失衡空间”、版本 `0.2.0 / 200`、横屏。Android 包名已配置为 `com.gravityshift.game`；也可改为自己的唯一包名，发布后保持稳定。
 5. App 图标已配置在 `static/icons/`。按需在可视化界面选用 `static/icons/icon.png`。
-6. 发行 → 原生 App → 云打包，只选择 Android，选择可用的云端证书或已有签名证书，输出格式选 APK，提交打包。菜单文案可能随 HBuilderX 版本略有变化。
+6. 发行 → 原生 App / App-Android/iOS → 云打包，勾选 Android，选择自己可用的云端证书或已有签名证书，输出格式选 APK，提交打包。菜单文案可能随 HBuilderX 版本略有变化。
 7. 从打包结果页下载 APK，安装到 Android 真机，执行下文的真机验证。账号登录、AppID 所属权限、签名选择和云端打包额度由 DCloud 验证，本仓库不保存账号密码或证书私钥。
 
 官方说明：[HBuilderX 运行与发布](https://uniapp.dcloud.net.cn/quickstart-hx)、[App 打包](https://uniapp.dcloud.net.cn/tutorial/app-pack.html)、[本地 WebView](https://uniapp.dcloud.net.cn/component/web-view)。
 
-**当前完成了本地 H5 和 Android App 资源编译，尚未提交 DCloud 云打包或生成已签名 APK。** App 资源编译成功不能替代 APK 签名、安装及真机验收。
+**当前完成了本地 H5 和 App 资源编译，尚未提交 DCloud 云打包或生成已签名 APK。** App 资源编译成功不能替代 APK 签名、安装及真机验收。
 
 ## 无构建快速试玩
 
@@ -41,7 +43,7 @@ node scripts/build.cjs app
 node scripts/preflight.cjs --cloud
 ```
 
-最后一条在 AppID 尚未由 HBuilderX 获取时会提示待处理，这不影响浏览器试玩。若 HBuilderX 不位于本项目上两级目录的 `HBuilderX` 文件夹，可设置：
+最后一条在占位 AppID 未替换时会明确报错，这不影响 H5 试玩和本地资源编译。若 HBuilderX 不位于本项目上两级目录的 `HBuilderX` 文件夹，可设置：
 
 ```powershell
 $env:HBUILDERX_HOME = '你的 HBuilderX.exe 所在目录'
@@ -84,7 +86,7 @@ $env:HBUILDERX_HOME = '你的 HBuilderX.exe 所在目录'
 
 其他功能：选关锁定与星级、继续最近关卡、提示、暂停/失败/结算、音效和振动开关、三档重力/触控灵敏度、存档迁移/备份恢复/失败重试、调试快照。
 
-主菜单不提供跳过所有关卡或直接解锁入口。游戏允许探索不同重力路径，不强制唯一解；部分机关可通过有技巧的绕行替代。
+主菜单不提供跳过所有关卡或直接解锁入口。0.2 游戏允许探索不同重力路径，部分机关可绕过；这是 0.3 设计修订所解决的问题，不能作为新关卡机关必要性的验收依据。
 
 ## 工程结构
 

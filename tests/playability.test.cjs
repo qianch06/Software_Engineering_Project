@@ -1,26 +1,7 @@
-const {test}=require('node:test'),assert=require('node:assert/strict');
-require('../static/game/js/core.js');global.Matter=require('../static/game/vendor/matter.min.js');require('../static/game/js/physics.js');require('../static/game/js/levels.js');require('../static/game/js/runtime.js');
-// Reference controller supplies legal gravity vectors only: no teleport, collision bypass or win injection.
-function steer(runtime,physics,target,limit=1800){
-  let dwell=0;
-  for(let i=0;i<limit&&!runtime.done&&!runtime.failed;i++){
-    const b=physics.get('ball'),dx=target.x-b.x,dy=target.y-b.y;
-    let x=dx*.018-b.vx*.42,y=dy*.018-b.vy*.42,n=Math.max(1,Math.hypot(x,y));
-    runtime.tick(1000/60,{x:x/n,y:y/n});
-    if(Math.hypot(dx,dy)<18&&Math.hypot(b.vx,b.vy)<1){if(++dwell>20)return true;}else dwell=0;
-  }
-  return runtime.done;
-}
-for(const level of LEVELS.filter(l=>l.goal.type!=='stable'))test('合法重力输入可完成 '+level.id,()=>{
-  const p=new PhysicsService(),r=new LevelRuntime(level,p);
-  if(level.resizable)p.scale('ball',.5); // Same density-preserving operation exposed to players.
-  let route;
-  if(level.id==='tut_hand'||level.id==='ch2_l03')route=[{x:700,y:745},{x:1200,y:745}];
-  else if(level.goal.colorChain?.length)route=level.goal.colorChain.map(color=>{const z=level.sensors.find(z=>z.dye===color);return{x:z.x,y:z.y};});
-  else if(level.goal.sequence?.length)route=level.goal.sequence.map(id=>{const z=level.sensors.find(z=>z.id===id);return{x:z.x,y:z.y};});
-  else route=[{x:250,y:350},{x:1480,y:350}];
-  route.push(level.collector);
-  for(const point of route){assert.ok(steer(r,p,point),level.id+' cannot reach '+JSON.stringify(point)+'; ball '+JSON.stringify(p.get('ball')));}
-  if(!r.done)steer(r,p,level.collector,600);
-  assert.equal(r.done,true);assert.equal(r.failed,false);p.dispose();
-});
+const{test}=require('node:test'),assert=require('node:assert/strict');
+const{levels,solutions,scene,action,run}=require('./helpers.cjs');
+// These replays use the same preparation API as mouse/touch; no ball position, velocity or gravity injection.
+for(const source of levels)for(const inverse of [false,...(source.id.startsWith('ch')?[true]:[])]){const l=inverse?GameCore.inverseLevel(source):source;test('合法建造并释放通关 '+l.id,()=>{const s=scene(l);for(const a of solutions[source.id])assert.ok(action(s,a),'illegal preparation '+JSON.stringify(a));assert.ok(s.release());run(s);assert.equal(s.phase,'cleared',JSON.stringify(s.physics.get('ball')));assert.equal(s.events.filter(e=>e.type==='win').length,1);if(!inverse&&source.id.startsWith('ch'))assert.equal(s.events.filter(e=>e.type==='shard').length,1,'fragment must be reachable');s.dispose();});}
+for(const id of ['tut_mech','ch1_l02','ch2_l01','ch2_l02','ch2_l04','ch3_l02'])for(const omitted of solutions[id].map((_,i)=>i))test('移除核心准备操作不入仓 '+id+' #'+omitted,()=>{const s=scene(id);solutions[id].forEach((a,i)=>{if(i!==omitted)assert.ok(action(s,a));});assert.ok(s.release());run(s,s.level.goal.starTimesMs[1]);assert.notEqual(s.phase,'cleared');s.dispose();});
+for(const id of ['tut_grav','tut_hand','ch1_l04','ch2_l02','ch3_l02'])test('空白释放不能跳过主题 '+id,()=>{const s=scene(id);s.release();run(s,s.level.goal.starTimesMs[1]);assert.notEqual(s.phase,'cleared');s.dispose();});
+test('光门既可用脉冲时序，也可用配重保持',()=>{for(const actions of [[],[{type:'place',id:'weight',point:{x:500,y:800}}]]){const s=scene('ch3_l01');actions.forEach(a=>assert.ok(action(s,a)));s.release();run(s);assert.equal(s.phase,'cleared');s.dispose();}});
