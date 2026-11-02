@@ -1,7 +1,22 @@
 (function(root) {
   'use strict';
   class PhysicsService {
-    constructor() { this.engine = Matter.Engine.create({enableSleeping:true}); this.items = new Map(); }
+    constructor() {
+      this.engine = Matter.Engine.create({enableSleeping:true}); this.items = new Map(); this.ballContacts = new Set();
+      Matter.Events.on(this.engine,'collisionStart',event=>{
+        for(const pair of event.pairs){
+          const a=this.items.get(pair.bodyA.label),b=this.items.get(pair.bodyB.label);if(!a||!b)continue;
+          const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;
+          const other=ball===a?b:a;if(other.spec.isSensor)continue;
+          this.ballContacts.add(other.spec.id);
+          const normal=pair.collision.normal,velocity=ball.body.velocity,otherVelocity=other.body.velocity;
+          const speed=Math.abs((velocity.x-otherVelocity.x)*normal.x+(velocity.y-otherVelocity.y)*normal.y);
+          this.onCollision?.({speed,x:ball.body.position.x,y:ball.body.position.y,other:other.spec.id});
+        }
+      });
+      Matter.Events.on(this.engine,'collisionActive',event=>{for(const pair of event.pairs){const a=this.items.get(pair.bodyA.label),b=this.items.get(pair.bodyB.label);if(!a||!b)continue;const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;const other=ball===a?b:a;if(!other.spec.isSensor)this.ballContacts.add(other.spec.id);}});
+      Matter.Events.on(this.engine,'collisionEnd',event=>{for(const pair of event.pairs){const a=this.items.get(pair.bodyA.label),b=this.items.get(pair.bodyB.label);if(!a||!b)continue;const ball=a.spec.category==='energyBall'?a:b.spec.category==='energyBall'?b:null;if(!ball)continue;this.ballContacts.delete((ball===a?b:a).spec.id);}});
+    }
     add(s) {
       const opts = {isStatic:!!s.isStatic, angle:s.angle||0, friction:s.friction??0.12, frictionAir:s.frictionAir??0.012, restitution:s.restitution??0.12, density:s.density||0.002, isSensor:!!s.isSensor, label:s.id};
       const b = s.type==='circle' ? Matter.Bodies.circle(s.x,s.y,s.r,opts) : Matter.Bodies.rectangle(s.x,s.y,s.w,s.h,opts);
@@ -40,6 +55,7 @@
       Matter.Body.setVelocity(a,{x:0,y:stopped?0:v});Matter.Body.setVelocity(b,{x:0,y:stopped?0:-v});
     }
     overlaps(a,b) { return !!Matter.Collision.collides(this.items.get(a).body,this.items.get(b).body); }
+    hasSolidContact(id) { return this.items.get(id)?.spec.category==='energyBall'&&this.ballContacts.size>0; }
     dispose() { Matter.Composite.clear(this.engine.world,false); Matter.Engine.clear(this.engine); this.items.clear(); }
   }
   root.PhysicsService=PhysicsService;
