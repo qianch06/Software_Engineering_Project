@@ -24,3 +24,14 @@ for(const level of LEVELS.filter(l=>l.goal.type!=='stable'))test('合法重力�
   if(!r.done)steer(r,p,level.collector,600);
   assert.equal(r.done,true);assert.equal(r.failed,false);p.dispose();
 });
+
+test('玻璃球区分实体碰撞与滚动接触，传感器不触发',()=>{
+  const physics=new PhysicsService(),hits=[];physics.onCollision=hit=>hits.push(hit);
+  physics.add({id:'ball',type:'circle',x:500,y:500,r:20,category:'energyBall'});
+  physics.add({id:'floor',type:'rect',x:500,y:535,w:200,h:20,isStatic:true,category:'terrain'});
+  physics.velocity('ball',{x:0,y:6});physics.step();
+  assert.equal(hits.length,1);assert.equal(hits[0].other,'floor');assert.ok(hits[0].speed>1);assert.equal(physics.hasSolidContact('ball'),true);
+  physics.add({id:'sensor',type:'rect',x:800,y:500,w:100,h:100,isStatic:true,isSensor:true});
+  physics.position('ball',{x:800,y:500});physics.velocity('ball',{x:0,y:0});physics.step();
+  assert.equal(hits.length,1);assert.equal(physics.hasSolidContact('ball'),false);physics.dispose();
+});

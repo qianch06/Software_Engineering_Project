@@ -7,13 +7,46 @@
   const storage=new StorageService(GamePlatform.storage);
   const renderer=new Renderer($('world')),gravity=new GravityController(),ui=new InteractionFX($('app'));
   const g={storage,physics:null,level:null,index:0,state:'menu',tool:'move',elapsed:0,resets:0,history:[],links:[],boardAngle:0,ballColor:'white',capture:0,preview:null,stroke:[],pointers:new Map(),keys:new Set(),sensorStarted:0};
-  let last=0,acc=0,toastTimer,detailTimer,audio,serial=0;
+  let last=0,acc=0,toastTimer,detailTimer,audio,rolling,serial=0;
   const clock=ms=>`${String(Math.floor(ms/60000)).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`;
   function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),4500);}
   function sound(kind){if(!storage.data.settings.sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),v=audio.createGain();o.type='sine';o.frequency.setValueAtTime(kind==='win'?660:kind==='bad'?150:440,audio.currentTime);o.frequency.exponentialRampToValueAtTime(kind==='bad'?90:880,audio.currentTime+.18);v.gain.setValueAtTime(.06,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.25);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+.26);}catch(e){}if(storage.data.settings.vibrate)try{GamePlatform.vibrate(kind==='win'?40:12);}catch(e){} }
+  function glassSound(strength){
+    if(!storage.data.settings.sound)return;
+    try{
+      audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();
+      const now=audio.currentTime,duration=.1+strength*.1,output=audio.createGain(),base=1350+strength*450;
+      output.gain.setValueAtTime(.0001,now);output.gain.exponentialRampToValueAtTime(.018+strength*.032,now+.004);output.gain.exponentialRampToValueAtTime(.0001,now+duration);output.connect(audio.destination);
+      [1,1.51,2.32].forEach((ratio,index)=>{const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.type='sine';oscillator.frequency.value=base*ratio;gain.gain.value=1/(index+1.4);oscillator.connect(gain);gain.connect(output);oscillator.start(now);oscillator.stop(now+duration);});
+    }catch(e){}
+  }
+  function onBallCollision(collision){
+    if(g.state!=='playing'||collision.speed<1.35)return;
+    const now=performance.now();if(now-(g.lastGlassSound||0)<90)return;g.lastGlassSound=now;glassSound(Math.min(1,collision.speed/12));
+  }
+  function stopRolling(){
+    if(!rolling)return;const current=rolling;rolling=null;
+    try{const now=audio.currentTime;current.gain.gain.cancelScheduledValues(now);current.gain.gain.setTargetAtTime(.0001,now,.02);current.source.onended=()=>{current.source.disconnect();current.filter.disconnect();current.gain.disconnect();};current.source.stop(now+.08);}catch(e){}
+  }
+  function updateRolling(){
+    if(!storage.data.settings.sound){stopRolling();return;}
+    const ball=g.state==='playing'?g.physics?.get('ball'):null;
+    const speed=ball&&g.physics.hasSolidContact('ball')?Math.max(Math.abs(ball.angularVelocity*ball.r),Math.hypot(ball.vx,ball.vy)*.65):0;
+    if(speed<.45){if(rolling)rolling.gain.gain.setTargetAtTime(.0001,audio.currentTime,.035);return;}
+    try{
+      audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();
+      if(!rolling){
+        const source=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain(),buffer=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate),data=buffer.getChannelData(0);
+        for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.45;
+        source.buffer=buffer;source.loop=true;filter.type='lowpass';filter.Q.value=.7;gain.gain.value=.0001;source.connect(filter);filter.connect(gain);gain.connect(audio.destination);source.start();rolling={source,filter,gain};
+      }
+      const now=audio.currentTime,strength=Math.min(1,speed/10);
+      rolling.gain.gain.setTargetAtTime(.003+strength*.012,now,.045);rolling.filter.frequency.setTargetAtTime(260+strength*720,now,.05);rolling.source.playbackRate.setTargetAtTime(.65+strength*.55,now,.06);
+    }catch(e){stopRolling();}
+  }
   function save(){if(!storage.save()){toast(storage.warning);setTimeout(()=>{if(!storage.save())setTimeout(()=>storage.save(),1000);},1000);}}
   function cancelGesture(){g.physics?.endDrag();g.dragCube=null;g.pointers.clear();g.preview=null;g.stroke=[];g.dragging=false;g.pinch=null;g.keys.clear();g.joyPointer=null;}
-  function showScreen(name){ui.transition(()=>{if(name!=='play')$('chain-progress').classList.add('hidden');for(const id of ['menu','select','play'])$(id).classList.toggle('hidden',id!==name);document.body.classList.toggle('playing',name==='play');$('modal').classList.add('hidden');$('level-detail').classList.add('hidden');cancelGesture();});}
+  function showScreen(name){stopRolling();ui.transition(()=>{if(name!=='play')$('chain-progress').classList.add('hidden');for(const id of ['menu','select','play'])$(id).classList.toggle('hidden',id!==name);document.body.classList.toggle('playing',name==='play');$('modal').classList.add('hidden');$('level-detail').classList.add('hidden');cancelGesture();});}
   function modal(html){$('modal-content').innerHTML=html;$('modal').classList.remove('hidden');cancelGesture();}
   function closeModal(){$('modal').classList.add('hidden');}
   function btn(text,action,cls='secondary'){return `<button class="${cls}" data-action="${action}">${text}</button>`;}
@@ -59,7 +92,7 @@
   function start(i,retry=false){
     try{validateLevel(LEVELS[i]);}catch(e){toast('关卡数据校验失败：'+e.message);return;}
     if(!retry){g.elapsed=0;g.resets=0;}else g.resets++;
-    g.physics?.dispose();g.physics=new PhysicsService();g.level=LEVELS[i];g.index=i;g.state='playing';g.tool='move';g.history=[];g.links=[];g.openDoors={};g.springTimes={};g.zones={};g.ballColor='white';g.capture=0;g.boardAngle=0;g.usedLine=false;g.hadBridge=false;renderer.fx=[];acc=0;
+    g.physics?.dispose();g.physics=new PhysicsService();g.physics.onCollision=onBallCollision;g.level=LEVELS[i];g.index=i;g.state='playing';g.tool='move';g.history=[];g.links=[];g.openDoors={};g.springTimes={};g.zones={};g.ballColor='white';g.capture=0;g.boardAngle=0;g.usedLine=false;g.hadBridge=false;g.lastGlassSound=0;renderer.fx=[];acc=0;
     gravity.target={...(g.level.initialGravity||{x:0,y:1})};gravity.value={...gravity.target};gravity.mode=storage.data.settings.controlMode;if(gravity.mode==='sensor'){g.sensorStarted=performance.now();gravity.lastSample=0;}
     g.runtime=new LevelRuntime(g.level,g.physics,onRuntimeEvent);g.openDoors=g.runtime.doors;
     showScreen('play');$('level-name').textContent=g.level.name;$('chapter-label').textContent=g.level.chapter;$('scale-tools').classList.toggle('hidden',!g.level.resizable);$('goal-label').textContent='◉ 0 / 1';$('sensor').textContent=gravity.mode==='sensor'?'圆盘操控':'启用倾斜';g.storage.data.lastLevelId=g.level.id;save();updateHud();toast(g.level.intro);
@@ -85,7 +118,7 @@
     else {if(used('line')>=g.level.lines||points.length<2)return;const stride=Math.max(1,Math.ceil((points.length-1)/20));for(let i=0;i<points.length-1;i+=stride){const a=points[i],b=points[Math.min(i+stride,points.length-1)],len=Math.hypot(a.x-b.x,a.y-b.y);if(len<5)continue;const id='line_'+serial++;g.physics.add({id,type:'rect',x:(a.x+b.x)/2,y:(a.y+b.y)/2,w:len+5,h:12,angle:Math.atan2(b.y-a.y,b.x-a.x),isStatic:true,category:'line'});ids.push(id);}g.usedLine=true;}
     if(ids.length){g.history.push({type,ids});sound('ok');}g.preview=null;g.stroke=[];if(used(type)>=(type==='board'?g.level.boards:g.level.lines))g.tool='move';updateHud();
   }
-  function pause(){if(g.state!=='playing')return;g.state='paused';acc=0;save();modal(`<p class="eyebrow"><i></i> 实验已安全挂起</p><h2>暂停片刻</h2><p>重力场已冻结，当前实验进度已保存。</p>${btn('恢复实验','resume','primary')}${btn('重新初始化','retry')}${btn('系统设置','settings')}${btn('返回实验节点','select','flat')}${btn('返回主控界面','menu','flat')}${GamePlatform.native?btn('退出游戏','exit','flat'):''}`);}
+  function pause(){if(g.state!=='playing')return;stopRolling();g.state='paused';acc=0;save();modal(`<p class="eyebrow"><i></i> 实验已安全挂起</p><h2>暂停片刻</h2><p>重力场已冻结，当前实验进度已保存。</p>${btn('恢复实验','resume','primary')}${btn('重新初始化','retry')}${btn('系统设置','settings')}${btn('返回实验节点','select','flat')}${btn('返回主控界面','menu','flat')}${GamePlatform.native?btn('退出游戏','exit','flat'):''}`);}
   function win(){g.state='cleared';const stars=storage.complete(g.level.id,g.elapsed,g.resets,g.level.goal?.starTimesMs);if(storage.warning)toast(storage.warning);sound('win');const c=g.level.collector;renderer.burst(c.x,c.y,'#62e6ff',90);modal(`<div class="result-core"><i></i><span></span></div><p class="eyebrow"><i></i> 核心同步完成</p><h2>空间结构已稳定</h2><div class="result-stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${g.level.name} · 能量核心激活，实验数据已归档。</p><div class="result-stats"><span>实验用时 ${clock(g.elapsed)}</span><span>重置 ${g.resets} 次</span></div>${g.index<(g.level.inverse?LEVELS.length:NORMAL_LEVELS.length)-1?btn('进入下一节点 →','next','primary'):btn('返回实验节点','select','primary')}${btn('重新实验','replay')}${btn('返回选关','select','flat')}`);}
   function fail(message){if(g.state!=='playing')return;g.state='failed';sound('bad');modal(`<p class="eyebrow">再试一种方向</p><h2>换一个方向</h2><p>${message}</p>${btn('回到起点','retry','primary')}${btn('查看提示','hint','flat')}${btn('返回选关','select','flat')}`);}
   function settings(){
@@ -144,9 +177,9 @@
   $('start').onclick=select;$('continue').onclick=()=>start(LEVELS.findIndex(l=>l.id===storage.data.lastLevelId));$('home').onclick=e=>{e.preventDefault();if(g.state==='playing')pause();else menu();};$('pause').onclick=pause;$('reset').onclick=()=>start(g.index,true);$('hint').onclick=()=>toast(g.level.hint+' 三星目标：'+((g.level.goal?.starTimesMs||[60000])[0]/1000)+' 秒内、零重置。');$('undo').onclick=undo;$('clear').onclick=()=>{while(g.history.length)undo();};$('rotate-board').onclick=()=>{if(g.state==='playing'){g.boardAngle+=Math.PI/12;toast('木板角度 '+Math.round(g.boardAngle*180/Math.PI)+'°');}};$('smaller').onclick=()=>scaleBall(g.physics.get('ball').scale-.1);$('larger').onclick=()=>scaleBall(g.physics.get('ball').scale+.1);
   for(const t of ['move','board','line'])$('tool-'+t).onclick=()=>setTool(t);
   document.querySelector('[data-open="settings"]').onclick=settings;document.querySelector('[data-open="about"]').onclick=()=>modal(`<p class="eyebrow">实验档案 · 版本 0.2</p><h2>失衡空间</h2><p>一款关于重力、空间与微小可能的物理解谜游戏。用倾斜、搭桥与画线，将能量球送回收集器。</p><p>本版收录三关教学、三章十五关与十五个倒映关。全部内容离线运行，无需联网。</p><p>桌面：方向键控制重力，数字键切换工具，加减键缩放，空格暂停。触屏：拖动圆盘，双指捏合小球；堆叠关可拖动方块。</p>${btn('回到空间','close-about','primary')}`);
-  function frame(t){const dt=Math.max(0,Math.min(t-last||16.67,50));last=t;if(g.state==='playing'){acc+=dt;try{while(acc>=1000/60&&g.state==='playing'){step(1000/60);acc-=1000/60;}if(g.tool==='line'&&g.dragging&&t-g.strokeStart>=5000){artifact('line',g.stroke);cancelGesture();}updateHud();}catch(e){console.error(e);fail('物理计算遇到了异常。请回到起点，再试一次。');}}else acc=0;if(g.level&&['playing','paused','cleared','failed'].includes(g.state))renderer.game(g,t);else renderer.menu(t);requestAnimationFrame(frame);}
+  function frame(t){const dt=Math.max(0,Math.min(t-last||16.67,50));last=t;if(g.state==='playing'){acc+=dt;try{while(acc>=1000/60&&g.state==='playing'){step(1000/60);acc-=1000/60;}if(g.tool==='line'&&g.dragging&&t-g.strokeStart>=5000){artifact('line',g.stroke);cancelGesture();}updateHud();}catch(e){console.error(e);fail('物理计算遇到了异常。请回到起点，再试一次。');}}else acc=0;updateRolling();if(g.level&&['playing','paused','cleared','failed'].includes(g.state))renderer.game(g,t);else renderer.menu(t);requestAnimationFrame(frame);}
   if(new URLSearchParams(location.search).get('debug')==='1'){
-    window.__demo={g,start,step,setTool,scaleBall,undo,artifact,storage,gravity,pause,select};
+    window.__demo={g,start,step,setTool,scaleBall,undo,artifact,storage,gravity,pause,select,glassSound,updateRolling,stopRolling};
     const panel=$('debug-panel');panel.classList.remove('hidden');panel.innerHTML='<span id="debug-state"></span><button id="debug-step">单步</button><button id="debug-export">快照</button>';
     const stateNames={menu:'主菜单',select:'选关',playing:'实验中',paused:'已暂停',cleared:'已完成',failed:'失败'};
     setInterval(()=>{$('debug-state').textContent=(stateNames[g.state]||g.state)+' · 物体 '+(g.physics?.items.size||0)+' · '+(gravity.mode==='sensor'?'倾斜':'圆盘');},300);
