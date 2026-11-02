@@ -176,7 +176,7 @@
       const active=visible[Math.round(ratio*(visible.length-1))];
       for(const card of cards)card.classList.toggle('is-magnetic',card===active);
       const index=cards.indexOf(active),label=document.getElementById('active-node'),progress=document.getElementById('readout-progress');
-      const text=`节点 ${String(index+1).padStart(2,'0')} · ${active.querySelector('strong').textContent}`;
+      const text=`关卡 ${String(index+1).padStart(2,'0')} · ${active.querySelector('strong').textContent}`;
       if(label.textContent!==text){label.textContent=text;label.classList.remove('readout-change');requestAnimationFrame(()=>label.classList.add('readout-change'));}
       progress.style.transform=`scaleX(${(index+1)/cards.length})`;
     }
