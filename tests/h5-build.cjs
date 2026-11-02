@@ -5,7 +5,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith('http://127.0.0.1:8765'))external.push(r.url());});
   await p.goto('http://127.0.0.1:8765/unpackage/dist/build/h5/');
   const f=p.frameLocator('iframe');await f.locator('#start').waitFor();assert.ok(p.url().includes('/unpackage/dist/build/h5/'));
-  await f.locator('#start').tap();assert.equal(await f.locator('.level-card').count(),18);await f.locator('.level-card').first().tap();await f.locator('#pause').tap();await f.locator('[data-action="resume"]').tap();
+  await f.locator('#start').tap();assert.equal(await f.locator('.level-card').count(),18);await f.locator('.level-card').first().tap();await f.locator('#detail-start').tap();await f.locator('#pause').tap();await f.locator('[data-action="resume"]').tap();
   await p.screenshot({path:path.resolve(__dirname,'artifacts/06-built-h5-mobile.png')});
   // Touch pinch and task-cube dragging use actual browser touch events.
   await p.goto('http://127.0.0.1:8765/static/game/index.html?debug=1');await p.evaluate(()=>__demo.start(2));

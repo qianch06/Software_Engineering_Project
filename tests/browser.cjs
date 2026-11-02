@@ -10,8 +10,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   await page.goto('http://127.0.0.1:8765/static/game/index.html?debug=1');await page.waitForTimeout(400);
   await page.screenshot({path:path.join(out,'01-menu.png')});
   await page.click('#start');assert.equal(await page.locator('.level-card').count(),18);
-  await page.locator('.level-card').nth(1).click();assert.ok((await page.locator('#toast').textContent()).includes('先完成'));
-  await page.locator('.level-card').first().click();await page.waitForTimeout(400);
+  await page.locator('.level-card').nth(1).click();assert.ok((await page.locator('#toast').textContent()).includes('先完成'));assert.equal(await page.locator('#detail-start').isDisabled(),true);await page.locator('#detail-close').click();await page.waitForTimeout(250);
+  await page.locator('.level-card').first().click();assert.equal(await page.locator('#level-detail').isVisible(),true);await page.locator('#detail-start').click();await page.waitForTimeout(650);
   await page.screenshot({path:path.join(out,'02-game.png')});
   // End-to-end first-level solution uses real keyboard input.
   await page.keyboard.down('ArrowRight');await page.waitForTimeout(500);await page.keyboard.up('ArrowRight');
@@ -48,6 +48,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   // The direct file entry also works with networking entirely disabled.
   const offline=await browser.newContext({offline:true,viewport:{width:1280,height:720}}),filePage=await offline.newPage();
   filePage.on('pageerror',e=>errors.push(e.message));
-  await filePage.goto(require('node:url').pathToFileURL(path.resolve(__dirname,'../play.html')).href);await filePage.waitForSelector('#start');await filePage.click('#start');await filePage.locator('.level-card').first().click();assert.equal(await filePage.locator('#play').isVisible(),true);await offline.close();
+  await filePage.goto(require('node:url').pathToFileURL(path.resolve(__dirname,'../play.html')).href);await filePage.waitForSelector('#start');await filePage.click('#start');await filePage.locator('.level-card').first().click();await filePage.locator('#detail-start').click();assert.equal(await filePage.locator('#play').isVisible(),true);await offline.close();
   assert.deepEqual(errors,[]);console.log('Browser checks passed; screenshots:',out);await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

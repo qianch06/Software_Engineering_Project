@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta name="theme-color" content="#050b14"><title>失衡空间 · Gravity Shift</title><link rel="stylesheet" href="style.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta name="theme-color" content="#050b14"><title>失衡空间</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <main id="app">
   <canvas id="world" aria-label="物理解谜游戏画布"></canvas>
   <div class="grain"></div><div class="interface-grid"></div><div class="scanline"></div>
-  <header class="brand"><a id="home" href="#" aria-label="返回主菜单"><span class="brand-icon"><i></i></span><span>GRAVITY SHIFT<small>GRAVITY RESEARCH DIVISION</small></span></a><span class="edition"><i></i> GS–07 空间站 / 系统在线</span></header>
+  <header class="brand"><a id="home" href="#" aria-label="返回主菜单"><span class="brand-icon"><i></i></span><span>失衡空间<small>重力研究站</small></span></a><span class="edition"><i></i> 七号空间站 · 一切正常</span></header>
   <section id="menu" class="screen">
-    <div class="menu-copy"><p class="eyebrow"><i></i> GRAVITY CONTROL LAB / SECTOR 07</p><h1>失衡<span>空间<span class="title-dot">.</span></span></h1><p class="subtitle">突破引力边界，重启空间秩序。</p><div class="menu-actions"><button id="start" class="primary"><small>INITIATE SEQUENCE</small>进入实验 <span>↗</span></button><button id="continue" class="secondary hidden"><small>RESUME SESSION</small>继续实验 <span>→</span></button></div><div class="menu-links"><button data-open="settings">系统设置</button><span>/</span><button data-open="about">实验档案</button></div></div>
-    <div class="energy-core" aria-hidden="true"><div class="core-orbit orbit-a"><i></i></div><div class="core-orbit orbit-b"><i></i></div><div class="core-ring"></div><div class="core-center"><i></i></div><span class="core-label">GRAVITY CORE<br><small>FIELD STABLE · 98.7%</small></span></div>
-    <div class="scene-caption"><span class="small-cross">+</span><span>实验区域 01 — 重力控制舱<br><small>核心同步完成，等待实验指令。</small></span></div><footer class="menu-footer"><span><i></i> LOCAL SIMULATION / 离线运行</span><span>GRAVITY SHIFT OS <b>V 0.2</b></span></footer>
+    <div class="menu-copy"><p class="eyebrow"><i></i> 重力控制实验室 · 第七区</p><h1>失衡<span>空间<span class="title-dot">.</span></span></h1><p class="subtitle">突破引力边界，重启空间秩序。</p><div class="menu-actions"><button id="start" class="primary fluid"><small>开始新的旅程</small>进入实验 <span>↗</span></button><button id="continue" class="secondary hidden"><small>返回最近的实验</small>继续实验 <span>→</span></button></div><div class="menu-links"><button data-open="settings">系统设置</button><span>/</span><button data-open="about">实验档案</button></div></div>
+    <div class="energy-core" aria-hidden="true"><div class="core-orbit orbit-a"><i></i></div><div class="core-orbit orbit-b"><i></i></div><div class="core-ring"></div><div class="core-center"><i></i></div><span class="core-label">重力核心<br><small>场域稳定 · 98.7%</small></span></div>
+    <div class="scene-caption"><span class="small-cross">+</span><span>实验区域 01 — 重力控制舱<br><small>核心同步完成，等待实验指令。</small></span></div><footer class="menu-footer"><span><i></i> 本地演算 · 离线运行</span><span>失衡空间 <b>版本 0.2</b></span></footer>
   </section>
-  <section id="select" class="screen hidden"><div class="section-heading"><p class="eyebrow"><i></i> EXPERIMENT NETWORK</p><h2>实验节点<span> / 关卡档案</span></h2><p>选择空间区域，建立重力连接。</p></div><div id="level-list"></div><footer class="selection-footer"><span id="total-stars"></span><span>18 个实验节点 · 集齐 15 枚碎片开启倒映实验区</span></footer></section>
+  <section id="select" class="screen hidden"><div class="section-heading"><div><p class="eyebrow"><i></i> 实验网络</p><h2>实验节点<span> / 关卡档案</span></h2><p>选择空间区域，建立重力连接。</p></div><div class="scroll-readout" aria-live="polite"><span id="active-node">节点 01</span><div class="readout-track"><i id="readout-progress"></i></div><small>随滚动定位实验节点</small></div></div><div id="level-list"></div><footer class="selection-footer"><span id="total-stars"></span><span>18 个实验节点 · 集齐 15 枚碎片开启倒映实验区</span></footer></section>
   <section id="play" class="screen hidden">
     <div class="hud"><button id="pause" class="icon-button" aria-label="暂停">Ⅱ</button><div class="hud-title"><span id="chapter-label"></span><h3 id="level-name"></h3></div><div class="hud-stats"><span id="goal-label">◉ 0 / 1</span><span id="timer">00:00</span><button id="reset" class="icon-button" aria-label="重新开始">↻</button></div></div>
     <div class="tutorial"><span id="step-num">01</span><div><small id="step-title">当前目标</small><p id="instruction"></p></div><button id="hint" aria-label="显示提示">?</button></div>
@@ -18,6 +18,7 @@
     <div class="gravity-ui"><span id="control-label">重力方向 · 拖动控制</span><div id="joystick" aria-label="拖动设置重力方向"><i></i><div id="knob"></div></div><button id="sensor">启用倾斜</button></div>
   </section>
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card" id="modal-content"></div></div>
+  <div id="level-detail" class="level-detail hidden" role="dialog" aria-modal="true" aria-labelledby="detail-title"><div class="detail-backdrop"></div><section class="detail-sheet"><button class="detail-handle" aria-label="拖动调整详情面板高度"><i></i></button><div id="detail-content"></div></section></div>
   <div id="chain-progress" class="hidden"></div><div id="debug-panel" class="hidden"></div><div id="toast" role="status"></div>
   <div id="rotate"><span>↻</span><h2>把世界横过来</h2><p>横屏，才能看见完整的空间。</p></div>
 </main>

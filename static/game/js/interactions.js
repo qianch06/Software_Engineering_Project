@@ -5,8 +5,11 @@
     constructor(app){
       this.app=app;
       this.reduced=matchMedia('(prefers-reduced-motion: reduce)');
+      this.hover=matchMedia('(hover: hover) and (pointer: fine)');
       this.origin={x:innerWidth/2,y:innerHeight/2};
       this.observed=new WeakSet();
+      this.tilted=new WeakSet();
+      this.drawers=new WeakSet();
       this.iris=document.createElement('div');
       this.iris.id='page-transition';
       this.iris.setAttribute('aria-hidden','true');
@@ -14,7 +17,8 @@
       app.addEventListener('pointerdown',event=>{
         this.origin={x:event.clientX,y:event.clientY};
         const button=event.target.closest('button');
-        if(!button||button.disabled||this.reduced.matches)return;
+        this.pressedButton=button;
+        if(!button||button.disabled||button.classList.contains('detail-handle')||this.reduced.matches)return;
         const rect=button.getBoundingClientRect(),ripple=document.createElement('i');
         ripple.className='button-ripple';
         ripple.style.left=`${event.clientX-rect.left}px`;
@@ -36,8 +40,12 @@
     }
 
     transition(update){
+      const source=this.pressedButton?.isConnected?this.pressedButton:document.activeElement;
+      const fluid=source?.classList?.contains('fluid')?source.getBoundingClientRect():null;
+      this.pressedButton=null;
       update();
       if(this.reduced.matches)return;
+      if(fluid){this.fluidTransition(fluid);return;}
       const x=this.origin.x,y=this.origin.y;
       const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))+40;
       this.iris.style.setProperty('--iris-x',`${x}px`);
@@ -48,6 +56,18 @@
       this.iris.classList.add('active');
       clearTimeout(this.transitionTimer);
       this.transitionTimer=setTimeout(()=>this.iris.classList.remove('active'),560);
+    }
+
+    fluidTransition(rect){
+      const morph=document.createElement('div');morph.className='fluid-morph';
+      Object.assign(morph.style,{left:`${rect.left}px`,top:`${rect.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});
+      this.app.appendChild(morph);
+      const animation=morph.animate([
+        {left:`${rect.left}px`,top:`${rect.top}px`,width:`${rect.width}px`,height:`${rect.height}px`,borderRadius:'999px',opacity:.82},
+        {left:'-4vw',top:'-6vh',width:'108vw',height:'112vh',borderRadius:'32px',opacity:.72,offset:.62},
+        {left:'-4vw',top:'-6vh',width:'108vw',height:'112vh',borderRadius:'32px',opacity:0}
+      ],{duration:480,easing:'cubic-bezier(.65,0,.35,1)',fill:'forwards'});
+      animation.onfinish=()=>morph.remove();
     }
 
     enhanceLevels(list,scroller){
@@ -80,6 +100,84 @@
         }
         this.drawConnections(grid);
       }
+      for(const card of list.querySelectorAll('.level-card'))this.attachTilt(card);
+      this.enableMagneticReadout(list,scroller);
+      requestAnimationFrame(()=>this.updateReadout());
+    }
+
+    attachTilt(card){
+      if(this.tilted.has(card))return;
+      this.tilted.add(card);
+      card.addEventListener('pointermove',event=>{
+        if(this.reduced.matches||(event.pointerType==='mouse'&&!this.hover.matches))return;
+        const rect=card.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width,y=(event.clientY-rect.top)/rect.height;
+        card.style.transition='transform .12s ease-out';
+        card.style.transform=`perspective(850px) rotateX(${(0.5-y)*5}deg) rotateY(${(x-0.5)*6}deg) translateY(-4px)`;
+        card.style.setProperty('--shine-x',`${x*100}%`);card.style.setProperty('--shine-y',`${y*100}%`);
+      },{passive:true});
+      card.addEventListener('pointerleave',()=>{
+        card.style.transition='transform .58s cubic-bezier(.2,1.45,.4,1)';
+        card.style.transform='';card.style.setProperty('--shine-x','50%');card.style.setProperty('--shine-y','20%');
+      },{passive:true});
+    }
+
+    sharedExpand(card,sheet){
+      if(this.reduced.matches)return;
+      const from=card.getBoundingClientRect(),to=sheet.getBoundingClientRect();
+      const clone=card.cloneNode(true);clone.classList.add('shared-clone');clone.style.transform='none';
+      clone.querySelectorAll('.button-ripple').forEach(item=>item.remove());
+      Object.assign(clone.style,{left:`${from.left}px`,top:`${from.top}px`,width:`${from.width}px`,height:`${from.height}px`});
+      this.app.appendChild(clone);sheet.classList.add('shared-arriving');
+      const animation=clone.animate([
+        {left:`${from.left}px`,top:`${from.top}px`,width:`${from.width}px`,height:`${from.height}px`,borderRadius:'14px',opacity:1},
+        {left:`${to.left}px`,top:`${to.top}px`,width:`${to.width}px`,height:`${to.height}px`,borderRadius:'28px',opacity:.15}
+      ],{duration:460,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
+      sheet.animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'translateY(0)'}],{duration:360,delay:100,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+      animation.onfinish=()=>{clone.remove();sheet.classList.remove('shared-arriving');};
+    }
+
+    attachDrawer(sheet,onClose){
+      if(this.drawers.has(sheet))return;
+      this.drawers.add(sheet);
+      const handle=sheet.querySelector('.detail-handle');let startY=0,delta=0,dragging=false,moved=false;
+      handle.addEventListener('pointerdown',event=>{
+        if(this.reduced.matches)return;
+        dragging=true;moved=false;startY=event.clientY;delta=0;handle.setPointerCapture(event.pointerId);sheet.classList.add('is-dragging');event.preventDefault();
+      });
+      handle.addEventListener('pointermove',event=>{
+        if(!dragging)return;delta=event.clientY-startY;if(Math.abs(delta)>4)moved=true;
+        sheet.style.transform=`translateY(${delta>0?delta:delta*.24}px)`;
+      });
+      const release=()=>{
+        if(!dragging)return;dragging=false;sheet.classList.remove('is-dragging');sheet.style.transform='';
+        if(delta>115){onClose();return;}
+        if(delta<-45)sheet.classList.add('expanded');else if(delta>45)sheet.classList.remove('expanded');
+      };
+      handle.addEventListener('pointerup',release);handle.addEventListener('pointercancel',release);
+      handle.addEventListener('click',()=>{if(moved){moved=false;return;}sheet.classList.toggle('expanded');});
+    }
+
+    enableMagneticReadout(list,scroller){
+      this.levelList=list;
+      if(this.readoutAttached)return;
+      this.readoutAttached=true;
+      let scheduled=false;
+      scroller.addEventListener('scroll',()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;this.updateReadout();});},{passive:true});
+      window.addEventListener('resize',()=>this.updateReadout(),{passive:true});
+    }
+
+    updateReadout(){
+      if(!this.levelList||!document.querySelector('#select:not(.hidden)'))return;
+      const cards=[...this.levelList.querySelectorAll('.level-card')],visible=cards.filter(card=>!card.closest('.collapsed'));
+      if(!visible.length)return;
+      const scroller=document.getElementById('select'),range=Math.max(0,scroller.scrollHeight-scroller.clientHeight);
+      const ratio=range?Math.max(0,Math.min(1,scroller.scrollTop/range)):0;
+      const active=visible[Math.round(ratio*(visible.length-1))];
+      for(const card of cards)card.classList.toggle('is-magnetic',card===active);
+      const index=cards.indexOf(active),label=document.getElementById('active-node'),progress=document.getElementById('readout-progress');
+      const text=`节点 ${String(index+1).padStart(2,'0')} · ${active.querySelector('strong').textContent}`;
+      if(label.textContent!==text){label.textContent=text;label.classList.remove('readout-change');requestAnimationFrame(()=>label.classList.add('readout-change'));}
+      progress.style.transform=`scaleX(${(index+1)/cards.length})`;
     }
 
     drawConnections(grid){
